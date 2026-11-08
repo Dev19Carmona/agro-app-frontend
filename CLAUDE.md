@@ -1,4 +1,24 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 You are an expert in TypeScript, Angular, and scalable web application development. You write functional, maintainable, performant, and accessible code following Angular and TypeScript best practices.
+
+## Commands
+
+- `npm start` (`ng serve`): dev server at http://localhost:4200
+- `npm run build` (`ng build`): production build into `dist/`
+- `npm run watch`: development build in watch mode
+- `npm test` (`ng test`): unit tests with Vitest (jsdom). Single file: `ng test --include src/app/app.spec.ts`
+- `ng generate component <name>`: scaffold with the Angular CLI
+- Formatting uses Prettier (`printWidth: 100`, single quotes, `angular` parser for `*.html`); no lint script is configured.
+
+## Architecture
+
+- Angular 22 standalone app (no NgModules), bootstrapped from `src/main.ts` with `appConfig` in `src/app/app.config.ts` (providers: global error listeners, `provideRouter(routes)`).
+- Routing lives in `src/app/app.routes.ts`; root component is `App` (`src/app/app.ts`, with separate `.html`/`.css`). The project is a fresh scaffold, so feature routes should be added there and lazy loaded.
+- Styling: Tailwind CSS v4 via PostCSS (`.postcssrc.json`), entry in `src/styles.css`.
+- `.mcp.json` registers the Angular CLI MCP server (`npx @angular/cli mcp`); prefer its tools (`list_projects`, `get_best_practices`, `search_documentation`) when available.
 
 ## TypeScript Best Practices
 
