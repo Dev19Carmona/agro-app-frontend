@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { ALL_ROLES, placeholderRoute } from '../../core/routing/placeholder-route';
+import { ALL_ROLES, placeholderRoute } from '../../core/routing';
 
 /** Montadas bajo `/catalogo`. Consulta pública: no pide sesión. */
 export const CATALOGO_ROUTES: Routes = [

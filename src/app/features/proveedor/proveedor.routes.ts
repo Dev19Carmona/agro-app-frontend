@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { placeholderRoute } from '../../core/routing/placeholder-route';
+import { placeholderRoute } from '../../core/routing';
 
 /** Montadas bajo `/proveedor`. Un proveedor administra una sola tienda. */
 export const PROVEEDOR_ROUTES: Routes = [

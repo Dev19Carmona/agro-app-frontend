@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { accessGuard } from './core/auth/access.guard';
+import { accessGuard } from './core/routing';
 
 /**
  * Árbol de rutas del MVP. Todo es lazy: cada dominio se carga con `loadChildren` y cada pantalla
@@ -11,51 +11,51 @@ export const routes: Routes = [
   {
     // Login y registro: pantalla completa, sin header ni panel (`AuthLayout`).
     path: 'auth',
-    loadComponent: () => import('./core/layout/auth-layout').then((m) => m.AuthLayout),
+    loadComponent: () => import('./core/layout/components/auth-layout/auth-layout').then((m) => m.AuthLayout),
     canActivateChild: [accessGuard],
-    loadChildren: () => import('./features/auth/auth.routes').then((m) => m.AUTH_ROUTES),
+    loadChildren: () => import('./features/auth').then((m) => m.AUTH_ROUTES),
   },
 
   {
     // Ruta layout: header, panel y contenido (`AppShell`).
     path: '',
-    loadComponent: () => import('./core/layout/app-shell').then((m) => m.AppShell),
+    loadComponent: () => import('./core/layout/components/app-shell/app-shell').then((m) => m.AppShell),
     canActivateChild: [accessGuard],
     children: [
       {
         path: 'catalogo',
         loadChildren: () =>
-          import('./features/catalogo/catalogo.routes').then((m) => m.CATALOGO_ROUTES),
+          import('./features/catalogo').then((m) => m.CATALOGO_ROUTES),
       },
       {
         path: 'cuenta',
-        loadChildren: () => import('./features/cuenta/cuenta.routes').then((m) => m.CUENTA_ROUTES),
+        loadChildren: () => import('./features/cuenta').then((m) => m.CUENTA_ROUTES),
       },
       {
         // Carrito, checkout y pedidos son rutas de primer nivel: `/carrito`, `/checkout`, `/pedidos…`.
         path: '',
         loadChildren: () =>
-          import('./features/pedidos/pedidos.routes').then((m) => m.PEDIDOS_ROUTES),
+          import('./features/pedidos').then((m) => m.PEDIDOS_ROUTES),
       },
       {
         path: 'pagos',
-        loadChildren: () => import('./features/pagos/pagos.routes').then((m) => m.PAGOS_ROUTES),
+        loadChildren: () => import('./features/pagos').then((m) => m.PAGOS_ROUTES),
       },
       {
         path: 'proveedor',
         loadChildren: () =>
-          import('./features/proveedor/proveedor.routes').then((m) => m.PROVEEDOR_ROUTES),
+          import('./features/proveedor').then((m) => m.PROVEEDOR_ROUTES),
       },
       {
         path: 'admin',
-        loadChildren: () => import('./features/admin/admin.routes').then((m) => m.ADMIN_ROUTES),
+        loadChildren: () => import('./features/admin').then((m) => m.ADMIN_ROUTES),
       },
 
       // Acceso denegado: sin `data.roles`, el guard no lo comprueba.
       {
         path: 'acceso-denegado',
         title: 'Acceso denegado',
-        loadComponent: () => import('./core/routing/forbidden').then((m) => m.Forbidden),
+        loadComponent: () => import('./core/routing/pages/forbidden/forbidden').then((m) => m.Forbidden),
       },
 
       // Demos de componentes de UI (`shared/ui`).
@@ -118,7 +118,7 @@ export const routes: Routes = [
       {
         path: '**',
         title: 'Página no encontrada',
-        loadComponent: () => import('./core/routing/not-found').then((m) => m.NotFound),
+        loadComponent: () => import('./core/routing/pages/not-found/not-found').then((m) => m.NotFound),
       },
     ],
   },

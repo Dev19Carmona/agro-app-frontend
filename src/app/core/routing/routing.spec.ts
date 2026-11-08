@@ -3,9 +3,9 @@ import { Title } from '@angular/platform-browser';
 import { Router, TitleStrategy, provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { routes } from '../../app.routes';
-import { AppRole, SessionRole } from '../auth/auth.types';
-import { SessionService } from '../auth/session';
-import { PageTitleStrategy } from './page-title.strategy';
+import { AppRole, SessionRole } from '../auth';
+import { SessionService } from '../auth';
+import { PageTitleStrategy } from './services/page-title.strategy';
 
 /** Navega a `url` con la sesión de `role` (`VISITANTE` = sin sesión). */
 async function go(url: string, role: SessionRole = 'VISITANTE') {

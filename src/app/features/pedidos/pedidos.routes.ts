@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { placeholderRoute } from '../../core/routing/placeholder-route';
+import { placeholderRoute } from '../../core/routing';
 
 const PRODUCTOR: ('PRODUCTOR')[] = ['PRODUCTOR'];
 

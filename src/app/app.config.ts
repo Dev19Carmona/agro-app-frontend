@@ -7,10 +7,10 @@ import {
 } from '@angular/core';
 import { TitleStrategy, provideRouter, withInMemoryScrolling } from '@angular/router';
 import { routes } from './app.routes';
-import { authInterceptor } from './core/auth/auth.interceptor';
-import { SessionRefresher } from './core/auth/session-refresher';
-import { clearLegacyDemoRole } from './core/navigation/legacy-demo-role';
-import { PageTitleStrategy } from './core/routing/page-title.strategy';
+import { authInterceptor } from './core/auth';
+import { SessionRefresher } from './core/auth';
+import { clearLegacyDemoRole } from './core/navigation';
+import { PageTitleStrategy } from './core/routing';
 
 export const appConfig: ApplicationConfig = {
   providers: [

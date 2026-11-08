@@ -1,6 +1,6 @@
 # SPEC 04 — Arquitectura de carpetas por módulo (core, features y shared)
 
-> **Status:** Borrador
+> **Status:** Implementado
 > **Depends on:** SPEC 01, SPEC 02, SPEC 03
 > **Date:** 2026-11-08
 > **Objective:** Reorganizar `src/app` con una estructura estándar de carpetas por tipo de archivo, un `index.ts` como API pública por módulo y una dirección de dependencias sin ciclos (la misma idea que `apps/api/src/modules/` del backend), y dejarla escrita como regla en `CLAUDE.md` para todo código nuevo.
