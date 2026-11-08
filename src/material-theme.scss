@@ -1,0 +1,20 @@
+@use '@angular/material' as mat;
+
+// Tema base de Angular Material (M3). Los tokens se emiten como variables CSS `--mat-sys-*`.
+// Tailwind vive en `styles.css`; este archivo se registra aparte en `angular.json`.
+html {
+  color-scheme: light;
+
+  @include mat.theme(
+    (
+      color: mat.$azure-palette,
+      typography: (system-ui, sans-serif),
+      density: 0,
+    )
+  );
+}
+
+// Modo oscuro controlado por la clase `.app-dark`, la misma que usa la variante `dark` de Tailwind.
+html.app-dark {
+  color-scheme: dark;
+}

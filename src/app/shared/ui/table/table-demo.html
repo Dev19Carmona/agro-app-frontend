@@ -1,0 +1,171 @@
+<div class="mx-auto max-w-5xl space-y-12 p-4">
+  <h1 class="text-3xl font-semibold">Tabla (app-table)</h1>
+
+  <section aria-labelledby="demo-basic" class="space-y-3">
+    <h2 id="demo-basic" class="text-xl font-semibold">Basic</h2>
+    <app-table [data]="products" [columns]="columns" />
+  </section>
+
+  <section aria-labelledby="demo-size" class="space-y-3">
+    <h2 id="demo-size" class="text-xl font-semibold">Size</h2>
+    <h3 class="font-medium">small</h3>
+    <app-table [data]="products" [columns]="columns" size="small" />
+    <h3 class="font-medium">medium</h3>
+    <app-table [data]="products" [columns]="columns" size="medium" />
+    <h3 class="font-medium">large</h3>
+    <app-table [data]="products" [columns]="columns" size="large" />
+  </section>
+
+  <section aria-labelledby="demo-gridlines" class="space-y-3">
+    <h2 id="demo-gridlines" class="text-xl font-semibold">Grid lines</h2>
+    <app-table [data]="products" [columns]="columns" [showGridlines]="true" />
+  </section>
+
+  <section aria-labelledby="demo-striped" class="space-y-3">
+    <h2 id="demo-striped" class="text-xl font-semibold">Striped rows</h2>
+    <app-table [data]="products" [columns]="columns" [striped]="true" />
+  </section>
+
+  <section aria-labelledby="demo-single" class="space-y-3">
+    <h2 id="demo-single" class="text-xl font-semibold">Selection: single</h2>
+    <app-table
+      [data]="products"
+      [columns]="columns"
+      selectionMode="single"
+      [(selection)]="single"
+    />
+  </section>
+
+  <section aria-labelledby="demo-multiple" class="space-y-3">
+    <h2 id="demo-multiple" class="text-xl font-semibold">Selection: multiple</h2>
+    <app-table
+      [data]="products"
+      [columns]="columns"
+      selectionMode="multiple"
+      [(selection)]="multiple"
+    />
+  </section>
+
+  <section aria-labelledby="demo-checkbox" class="space-y-3">
+    <h2 id="demo-checkbox" class="text-xl font-semibold">Selection: checkbox</h2>
+    <app-table
+      [data]="products"
+      [columns]="columns"
+      selectionMode="multiple"
+      selectionControl="checkbox"
+      [(selection)]="checkbox"
+    />
+  </section>
+
+  <section aria-labelledby="demo-radio" class="space-y-3">
+    <h2 id="demo-radio" class="text-xl font-semibold">Selection: radio</h2>
+    <app-table
+      [data]="products"
+      [columns]="columns"
+      selectionMode="single"
+      selectionControl="radio"
+      [(selection)]="radio"
+    />
+  </section>
+
+  <section aria-labelledby="demo-keyboard" class="space-y-3">
+    <h2 id="demo-keyboard" class="text-xl font-semibold">Selection: teclado</h2>
+    <p>Enfoca una fila, muévete con las flechas y selecciona con Enter o Espacio.</p>
+    <app-table
+      [data]="products"
+      [columns]="columns"
+      selectionMode="multiple"
+      [keyboardSelection]="true"
+      [(selection)]="keyboard"
+    />
+  </section>
+
+  <section aria-labelledby="demo-column" class="space-y-3">
+    <h2 id="demo-column" class="text-xl font-semibold">Selection: por columna</h2>
+    <p>El checkbox se muestra en la columna marcada como <code>selectable</code> (Nombre).</p>
+    <app-table
+      [data]="products"
+      [columns]="selectableColumns"
+      selectionMode="multiple"
+      selectionControl="checkbox"
+      [(selection)]="byColumn"
+    />
+  </section>
+
+  <section aria-labelledby="demo-events" class="space-y-3">
+    <h2 id="demo-events" class="text-xl font-semibold">Selection: eventos</h2>
+    <app-table
+      [data]="products"
+      [columns]="columns"
+      selectionMode="multiple"
+      selectionControl="checkbox"
+      [(selection)]="eventsSelection"
+      (rowSelect)="logEvent('seleccionada', $event)"
+      (rowUnselect)="logEvent('deseleccionada', $event)"
+    />
+    <ul aria-live="polite" class="list-disc pl-6">
+      @for (message of events(); track $index) {
+        <li>{{ message }}</li>
+      } @empty {
+        <li>Sin eventos todavía.</li>
+      }
+    </ul>
+  </section>
+
+  <section aria-labelledby="demo-cell" class="space-y-3">
+    <h2 id="demo-cell" class="text-xl font-semibold">Celda personalizada</h2>
+    <app-table [data]="products" [columns]="cellColumns">
+      <ng-template appTableCell="status" let-row>
+        <span
+          class="rounded px-2 py-1 text-sm font-semibold"
+          [class]="isAvailable(row) ? 'bg-green-100 text-green-900' : 'bg-red-100 text-red-900'"
+        >
+          {{ statusOf(row) }}
+        </span>
+      </ng-template>
+    </app-table>
+  </section>
+
+  <section aria-labelledby="demo-sort-single" class="space-y-3">
+    <h2 id="demo-sort-single" class="text-xl font-semibold">Sort: single</h2>
+    <app-table
+      [data]="products"
+      [columns]="sortableColumns"
+      sortMode="single"
+      [(sort)]="sortSingle"
+    />
+  </section>
+
+  <section aria-labelledby="demo-sort-multiple" class="space-y-3">
+    <h2 id="demo-sort-multiple" class="text-xl font-semibold">Sort: multiple</h2>
+    <p>Cada clic en una cabecera añade esa columna al orden.</p>
+    <app-table
+      [data]="products"
+      [columns]="sortableColumns"
+      sortMode="multiple"
+      [(sort)]="sortMultiple"
+    />
+  </section>
+
+  <section aria-labelledby="demo-sort-presort" class="space-y-3">
+    <h2 id="demo-sort-presort" class="text-xl font-semibold">Sort: presort</h2>
+    <app-table
+      [data]="products"
+      [columns]="sortableColumns"
+      sortMode="multiple"
+      [(sort)]="sortPresort"
+    />
+  </section>
+
+  <section aria-labelledby="demo-sort-removable" class="space-y-3">
+    <h2 id="demo-sort-removable" class="text-xl font-semibold">Sort: removable</h2>
+    <p>Un tercer clic en la cabecera quita el orden.</p>
+    <app-table
+      [data]="products"
+      [columns]="sortableColumns"
+      sortMode="single"
+      [removableSort]="true"
+      [(sort)]="sortRemovable"
+    />
+  </section>
+</div>

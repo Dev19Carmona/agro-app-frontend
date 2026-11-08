@@ -1,0 +1,72 @@
+/* Densidad: sobrescribe los tokens de Material para `mat-table`. `medium` usa los valores base. */
+.app-table-small {
+  --mat-table-row-item-container-height: 36px;
+  --mat-table-header-container-height: 40px;
+}
+
+.app-table-large {
+  --mat-table-row-item-container-height: 68px;
+  --mat-table-header-container-height: 72px;
+}
+
+/* Grid lines: bordes en todas las celdas. */
+.app-table-gridlines {
+  border-collapse: collapse;
+}
+
+.app-table-gridlines .mat-mdc-cell,
+.app-table-gridlines .mat-mdc-header-cell {
+  border: 1px solid var(--mat-sys-outline-variant);
+}
+
+/* Striped rows: fondo alterno en las filas pares. */
+.app-table-striped .mat-mdc-row:nth-child(even) {
+  background: var(--mat-sys-surface-container);
+}
+
+/* Celdas con control (checkbox/radio), contenido y botón de orden en línea. */
+.app-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Filas seleccionables: puntero, foco visible y estado seleccionado. */
+.app-row-selectable {
+  cursor: pointer;
+}
+
+.app-row-selectable:focus-visible {
+  outline: 2px solid var(--mat-sys-primary);
+  outline-offset: -2px;
+}
+
+.app-table .app-row-selected.mat-mdc-row {
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+}
+
+/* Cabeceras ordenables. */
+.app-sort-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.app-sort-button:focus-visible {
+  outline: 2px solid var(--mat-sys-primary);
+  outline-offset: 2px;
+}
+
+.app-sort-icon {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}

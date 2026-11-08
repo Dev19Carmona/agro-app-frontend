@@ -1,0 +1,114 @@
+<table mat-table class="app-table" [class]="tableClasses()" [dataSource]="sortedData()">
+  @if (extraControlColumn()) {
+    <ng-container [matColumnDef]="selectColumn">
+      <th mat-header-cell *matHeaderCellDef scope="col">
+        @if (selectionControl() === 'checkbox') {
+          <ng-container [ngTemplateOutlet]="headerCheckbox" />
+        } @else {
+          <span class="sr-only">Selección</span>
+        }
+      </th>
+      <td mat-cell *matCellDef="let row">
+        <ng-container [ngTemplateOutlet]="control" [ngTemplateOutletContext]="{ $implicit: row }" />
+      </td>
+    </ng-container>
+  }
+
+  @for (col of columns(); track col.field) {
+    <ng-container [matColumnDef]="col.field">
+      <th
+        mat-header-cell
+        *matHeaderCellDef
+        scope="col"
+        [style.width]="col.width"
+        [attr.aria-sort]="isSortable(col) ? ariaSort(col.field) : null"
+      >
+        <div class="app-cell">
+          @if (col.field === controlField() && selectionControl() === 'checkbox') {
+            <ng-container [ngTemplateOutlet]="headerCheckbox" />
+          }
+          @if (isSortable(col)) {
+            <button type="button" class="app-sort-button" (click)="toggleSort(col.field)">
+              {{ col.header }}
+              <svg class="app-sort-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                @switch (sortOrder(col.field)) {
+                  @case ('asc') {
+                    <path d="M12 4 5 12h5v8h4v-8h5z" />
+                  }
+                  @case ('desc') {
+                    <path d="m12 20 7-8h-5V4h-4v8H5z" />
+                  }
+                  @default {
+                    <path d="m12 3-5 6h10zm0 18 5-6H7z" />
+                  }
+                }
+              </svg>
+              @if (sortPriority(col.field); as priority) {
+                <sup aria-hidden="true">{{ priority }}</sup>
+              }
+            </button>
+          } @else {
+            {{ col.header }}
+          }
+        </div>
+      </th>
+      <td mat-cell *matCellDef="let row">
+        <div class="app-cell">
+          @if (col.field === controlField()) {
+            <ng-container
+              [ngTemplateOutlet]="control"
+              [ngTemplateOutletContext]="{ $implicit: row }"
+            />
+          }
+          @if (cellTemplates().get(col.field); as tpl) {
+            <ng-container
+              [ngTemplateOutlet]="tpl"
+              [ngTemplateOutletContext]="{ $implicit: row, column: col.field }"
+            />
+          } @else {
+            {{ cellValue(row, col.field) }}
+          }
+        </div>
+      </td>
+    </ng-container>
+  }
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
+  <tr
+    mat-row
+    *matRowDef="let row; columns: displayedColumns(); let i = index"
+    [class.app-row-selectable]="rowSelectable()"
+    [class.app-row-selected]="isSelected(row)"
+    [attr.tabindex]="rowTabindex(i)"
+    [attr.aria-selected]="rowSelectable() ? isSelected(row) : null"
+    (click)="onRowClick(row)"
+    (focus)="focusedIndex.set(i)"
+    (keydown)="onRowKeydown($event, row)"
+  ></tr>
+</table>
+
+<ng-template #headerCheckbox>
+  <mat-checkbox
+    aria-label="Seleccionar todas las filas"
+    [checked]="allSelected()"
+    [indeterminate]="someSelected()"
+    (change)="toggleAll()"
+  />
+</ng-template>
+
+<ng-template #control let-row>
+  @if (selectionControl() === 'checkbox') {
+    <mat-checkbox
+      aria-label="Seleccionar fila"
+      [checked]="isSelected(row)"
+      (change)="toggleRow(row)"
+    />
+  } @else {
+    <mat-radio-button
+      aria-label="Seleccionar fila"
+      [name]="radioName"
+      [checked]="isSelected(row)"
+      (change)="selectRow(row)"
+    />
+  }
+</ng-template>
