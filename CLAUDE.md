@@ -37,6 +37,14 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Use `NgOptimizedImage` for all static images.
   - `NgOptimizedImage` does not work for inline base64 images.
 
+## Componentes de UI
+
+- Toda tarea que necesite un componente de UI nuevo (o una feature nueva en uno existente) DEBE invocar la skill `ui-component` (`.claude/skills/ui-component/SKILL.md`) antes de escribir código.
+- Los componentes de UI viven en `src/app/shared/ui/` como wrappers propios con prefijo `app-` y API con tipos propios.
+- Está PROHIBIDO importar `@angular/material/*` y `@angular/cdk/*` fuera de `src/app/shared/ui/`. El tema de Material vive en `src/material-theme.scss` y se registra en `angular.json`.
+- Las features y páginas consumen solo los componentes `app-*`, nunca `mat-*` ni utilidades del CDK directamente.
+- No se usa PrimeNG: se eliminó por su licencia (ver `specs/01-skill-ui-component-y-tabla.md`).
+
 ## Accessibility Requirements
 
 - It MUST pass all AXE checks.
