@@ -1,14 +1,22 @@
 import { TestBed } from '@angular/core/testing';
-import { DemoRoleService } from './demo-role';
-import { DEMO_ROLE_OPTIONS, NAV_GROUP_ORDER, NAV_ITEMS } from './nav.config';
+import { SessionService } from '../auth/session';
+import { NAV_GROUP_ORDER, NAV_ITEMS, SESSION_ROLE_LABELS } from './nav.config';
 import { NavigationService } from './navigation';
-import { DemoRole } from './navigation.types';
+import { AppRole, SessionRole } from '../auth/auth.types';
 import { ICON_PATHS } from '../../shared/ui/icon/icon-paths';
 
-function groupsFor(role: DemoRole) {
+function signIn(role: AppRole): void {
+  TestBed.inject(SessionService).start(
+    { accessToken: 'a', refreshToken: 'r' },
+    { id: '1', email: 'a@agro.test', nombre: 'A', rol: role, status: 'ACTIVE' },
+  );
+}
+
+function groupsFor(role: SessionRole) {
   localStorage.clear();
-  const demoRole = TestBed.inject(DemoRoleService);
-  demoRole.setRole(role);
+  if (role !== 'VISITANTE') {
+    signIn(role);
+  }
   return TestBed.inject(NavigationService)
     .groups()
     .map((g) => ({ name: g.name, labels: g.items.map((i) => i.label) }));
@@ -51,18 +59,17 @@ describe('NavigationService', () => {
     ]);
   });
 
-  it('se actualiza cuando cambia el rol', () => {
+  it('se actualiza cuando cambia la sesión', () => {
     localStorage.clear();
-    const role = TestBed.inject(DemoRoleService);
     const nav = TestBed.inject(NavigationService);
     expect(nav.groups().map((g) => g.name)).not.toContain('Administración');
-    role.setRole('ADMIN');
+    signIn('ADMIN');
     expect(nav.groups().map((g) => g.name)).toContain('Administración');
   });
 });
 
 describe('NAV_ITEMS (configuración)', () => {
-  const roles = DEMO_ROLE_OPTIONS.map((o) => o.id);
+  const roles = Object.keys(SESSION_ROLE_LABELS) as SessionRole[];
 
   it('cada ítem usa un grupo, un rol y un icono que existen', () => {
     for (const item of NAV_ITEMS) {

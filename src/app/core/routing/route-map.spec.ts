@@ -1,5 +1,7 @@
 import { Route, Routes } from '@angular/router';
 import { routes } from '../../app.routes';
+import { accessGuard } from '../auth/access.guard';
+import { SessionRole } from '../auth/auth.types';
 import { NAV_ITEMS } from '../navigation/nav.config';
 import { RouteInfo } from '../navigation/navigation.types';
 
@@ -68,7 +70,10 @@ describe('Mapa de rutas', () => {
 
   beforeAll(async () => {
     all = await collectLeaves(routes);
-    screens = all.filter((leaf) => !leaf.path.startsWith('/ui/'));
+    // `/acceso-denegado` y las demos `/ui/*` no son pantallas del mapa de negocio.
+    screens = all.filter(
+      (leaf) => !leaf.path.startsWith('/ui/') && leaf.path !== '/acceso-denegado',
+    );
   });
 
   it('contiene exactamente las pantallas del mapa de SPEC 02, sin repetidas', () => {
@@ -96,11 +101,14 @@ describe('Mapa de rutas', () => {
     }
   });
 
-  it('todas las pantallas son lazy (loadComponent) y no hay guards', () => {
+  it('todas las pantallas son lazy (loadComponent) y el guard va en los layouts, no en cada ruta', () => {
     for (const { path, route } of all) {
       expect(typeof route.loadComponent, `${path}: loadComponent`).toBe('function');
       expect(route.component, `${path}: sin component síncrono`).toBeUndefined();
-      expect(route.canActivate, `${path}: sin guards en SPEC 02`).toBeUndefined();
+      expect(
+        route.canActivate,
+        `${path}: el guard va en el layout (canActivateChild)`,
+      ).toBeUndefined();
     }
   });
 
@@ -123,20 +131,48 @@ describe('Mapa de rutas', () => {
     // cuelgan de otra (detalle, alta, edición, pago): llevan parámetro, "nuevo" o "pago".
     const linked = new Set(NAV_ITEMS.map((item) => item.path));
     const orphans = screens
-      .filter(({ path }) => !path.includes(':') && !path.endsWith('/nuevo') && !path.endsWith('/pago'))
+      .filter(
+        ({ path }) => !path.includes(':') && !path.endsWith('/nuevo') && !path.endsWith('/pago'),
+      )
       .filter(({ path }) => !linked.has(path))
       .map(({ path }) => path);
     // /checkout se alcanza desde el carrito.
     expect(orphans).toEqual(['/checkout']);
   });
 
-  it('lista las pantallas que aún usan el placeholder (SPEC 03 las irá sustituyendo)', () => {
+  it('lista las pantallas que aún usan el placeholder (SPEC 04 las irá sustituyendo)', () => {
     const pending = screens
       .filter(({ route }) => String(route.loadComponent).includes('route-placeholder'))
       .map(({ path }) => path);
     console.info(`Pantallas con placeholder: ${pending.length} de ${screens.length}`);
-    // En SPEC 02 son todas; a medida que SPEC 03 las maqueta este número baja a 0.
+    // A medida que SPEC 04 las maqueta este número baja a 0.
     expect(pending.length).toBeLessThanOrEqual(screens.length);
     expect(pending.every((path) => SPEC_ROUTES.includes(path))).toBe(true);
+  });
+  it('los roles de cada pantalla son valores de SessionRole', () => {
+    const valid: SessionRole[] = ['VISITANTE', 'PRODUCTOR', 'PROVEEDOR', 'ADMIN'];
+    for (const { path, route } of screens) {
+      for (const role of (route.data as RouteInfo).roles) {
+        expect(valid, `${path}: rol ${role}`).toContain(role);
+      }
+    }
+  });
+
+  it('solo login y registro son rutas de invitado; las privadas no incluyen VISITANTE', () => {
+    const guest = screens
+      .filter(({ route }) => {
+        const roles = (route.data as RouteInfo).roles;
+        return roles.length === 1 && roles[0] === 'VISITANTE';
+      })
+      .map(({ path }) => path);
+    expect(guest.sort()).toEqual(['/auth/login', '/auth/registro']);
+  });
+
+  it('los dos layouts (auth y shell) aplican accessGuard con canActivateChild', () => {
+    const layouts = routes.filter((route) => route.canActivateChild);
+    expect(layouts.map((route) => route.path)).toEqual(['auth', '']);
+    for (const layout of layouts) {
+      expect(layout.canActivateChild).toEqual([accessGuard]);
+    }
   });
 });

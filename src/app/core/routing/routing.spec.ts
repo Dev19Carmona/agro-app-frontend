@@ -3,12 +3,21 @@ import { Title } from '@angular/platform-browser';
 import { Router, TitleStrategy, provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { routes } from '../../app.routes';
+import { AppRole, SessionRole } from '../auth/auth.types';
+import { SessionService } from '../auth/session';
 import { PageTitleStrategy } from './page-title.strategy';
 
-async function go(url: string) {
+/** Navega a `url` con la sesión de `role` (`VISITANTE` = sin sesión). */
+async function go(url: string, role: SessionRole = 'VISITANTE') {
   TestBed.configureTestingModule({
     providers: [provideRouter(routes), { provide: TitleStrategy, useClass: PageTitleStrategy }],
   });
+  if (role !== 'VISITANTE') {
+    TestBed.inject(SessionService).start(
+      { accessToken: 'a', refreshToken: 'r' },
+      { id: '1', email: 'a@agro.test', nombre: 'A', rol: role, status: 'ACTIVE' },
+    );
+  }
   const harness = await RouterTestingHarness.create();
   await harness.navigateByUrl(url);
   harness.detectChanges();
@@ -18,7 +27,9 @@ async function go(url: string) {
     router: TestBed.inject(Router),
     h1: el.querySelector('h1')?.textContent?.trim(),
     badges: Array.from(el.querySelectorAll('app-badge')).map((b) => b.textContent?.trim()),
-    codes: Array.from(el.querySelectorAll('code')).map((c) => c.textContent?.replace(/\s+/g, ' ').trim()),
+    codes: Array.from(el.querySelectorAll('code')).map((c) =>
+      c.textContent?.replace(/\s+/g, ' ').trim(),
+    ),
     title: TestBed.inject(Title).getTitle(),
   };
 }
@@ -37,7 +48,7 @@ describe('Árbol de rutas', () => {
   });
 
   it('muestra título, rol, descripción y endpoints de una ruta con parámetro', async () => {
-    const { h1, badges, codes, title, el } = await go('/admin/usuarios/7');
+    const { h1, badges, codes, title, el } = await go('/admin/usuarios/7', 'ADMIN');
     expect(h1).toBe('Detalle de usuario');
     expect(badges).toEqual(['Administrador']);
     expect(codes).toContain('POST /auth/users/:id/approve');
@@ -47,28 +58,45 @@ describe('Árbol de rutas', () => {
   });
 
   it('productos/nuevo no se confunde con productos/:id', async () => {
-    const { h1, codes } = await go('/proveedor/productos/nuevo');
+    const { h1, codes } = await go('/proveedor/productos/nuevo', 'PROVEEDOR');
     expect(h1).toBe('Nuevo producto');
     expect(codes).toEqual(['POST /catalog/products']);
   });
 
-  it.each([
-    ['/carrito', 'Carrito'],
-    ['/checkout', 'Confirmar pedido'],
-    ['/pedidos', 'Mis pedidos'],
-    ['/pedidos/5', 'Detalle de pedido'],
-    ['/pedidos/5/pago', 'Pagar pedido'],
-    ['/pagos', 'Mis pagos'],
-    ['/pagos/9', 'Detalle de pago'],
-    ['/cuenta', 'Mi cuenta'],
-    ['/auth/login', 'Iniciar sesión'],
-    ['/auth/registro', 'Crear cuenta'],
-    ['/proveedor/tienda', 'Mi tienda'],
-    ['/admin/pagos', 'Pagos (admin)'],
-  ])('%s carga su pantalla "%s"', async (url, title) => {
-    const { h1, title: docTitle } = await go(url);
+  it.each<[string, string, SessionRole]>([
+    ['/carrito', 'Carrito', 'PRODUCTOR'],
+    ['/checkout', 'Confirmar pedido', 'PRODUCTOR'],
+    ['/pedidos', 'Mis pedidos', 'PRODUCTOR'],
+    ['/pedidos/5', 'Detalle de pedido', 'PRODUCTOR'],
+    ['/pedidos/5/pago', 'Pagar pedido', 'PRODUCTOR'],
+    ['/pagos', 'Mis pagos', 'PRODUCTOR'],
+    ['/pagos/9', 'Detalle de pago', 'PRODUCTOR'],
+    ['/cuenta', 'Mi cuenta', 'PRODUCTOR'],
+    ['/auth/login', 'Iniciar sesión', 'VISITANTE'],
+    ['/auth/registro', 'Crear cuenta', 'VISITANTE'],
+    ['/proveedor/tienda', 'Mi tienda', 'PROVEEDOR'],
+    ['/admin/pagos', 'Pagos (admin)', 'ADMIN'],
+  ])('%s carga su pantalla "%s"', async (url, title, role) => {
+    const { h1, title: docTitle } = await go(url, role);
     expect(h1).toBe(title);
     expect(docTitle).toBe(`${title} · Mini-Croper`);
+  });
+
+  it.each(['/auth/login', '/auth/registro'])(
+    '%s se muestra sin header ni panel (AuthLayout)',
+    async (url) => {
+      const { el } = await go(url);
+      expect(el.querySelector('app-auth-layout main h1')).not.toBeNull();
+      expect(el.querySelector('app-header')).toBeNull();
+      expect(el.querySelector('aside')).toBeNull();
+    },
+  );
+
+  it('el resto de rutas siguen dentro del shell', async () => {
+    const { el } = await go('/catalogo');
+    expect(el.querySelector('app-shell app-header')).not.toBeNull();
+    expect(el.querySelector('app-shell aside')).not.toBeNull();
+    expect(el.querySelector('app-auth-layout')).toBeNull();
   });
 
   it('una URL inexistente muestra la 404 con enlace al catálogo', async () => {
@@ -78,10 +106,36 @@ describe('Árbol de rutas', () => {
     expect(el.querySelector('a[href="/catalogo"]')).not.toBeNull();
   });
 
-  it('las rutas de rol son accesibles por URL con cualquier rol de demo (sin guards)', async () => {
-    localStorage.clear();
-    const { h1 } = await go('/admin/usuarios');
-    expect(h1).toBe('Usuarios');
+  it.each(['/carrito', '/cuenta', '/admin/usuarios'])(
+    'un visitante que abre %s va a login con returnUrl',
+    async (url) => {
+      const { router } = await go(url);
+      expect(router.url).toBe(`/auth/login?returnUrl=${encodeURIComponent(url)}`);
+    },
+  );
+
+  it.each<[string, AppRole]>([
+    ['/admin/usuarios', 'PRODUCTOR'],
+    ['/proveedor/productos', 'PRODUCTOR'],
+    ['/carrito', 'PROVEEDOR'],
+  ])('%s con rol %s muestra /acceso-denegado', async (url, role) => {
+    const { router, h1, title } = await go(url, role);
+    expect(router.url).toBe('/acceso-denegado');
+    expect(h1).toBe('Acceso denegado');
+    expect(title).toBe('Acceso denegado · Mini-Croper');
+  });
+
+  it.each(['/auth/login', '/auth/registro'])('con sesión, %s redirige a /catalogo', async (url) => {
+    const { router } = await go(url, 'PRODUCTOR');
+    expect(router.url).toBe('/catalogo');
+  });
+
+  it('el catálogo es público para un visitante', async () => {
+    for (const url of ['/catalogo', '/catalogo/ofertas', '/catalogo/tiendas']) {
+      const { router } = await go(url);
+      expect(router.url).toBe(url);
+      TestBed.resetTestingModule();
+    }
   });
 
   it('las demos /ui/* siguen disponibles', async () => {
