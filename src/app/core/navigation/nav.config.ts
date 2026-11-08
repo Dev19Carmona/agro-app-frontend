@@ -1,13 +1,14 @@
 import type { IconName } from '../../shared/ui/icon/icon.types';
-import type { DemoRole, NavGroupName, NavItem } from './navigation.types';
+import type { SessionRole } from '../auth/auth.types';
+import type { NavGroupName, NavItem } from './navigation.types';
 
-/** Opciones del selector de rol de demo del header. */
-export const DEMO_ROLE_OPTIONS: readonly { id: DemoRole; label: string }[] = [
-  { id: 'VISITANTE', label: 'Visitante' },
-  { id: 'PRODUCTOR', label: 'Productor' },
-  { id: 'PROVEEDOR', label: 'Proveedor' },
-  { id: 'ADMIN', label: 'Administrador' },
-];
+/** Nombre legible de cada rol de la sesión. */
+export const SESSION_ROLE_LABELS: Readonly<Record<SessionRole, string>> = {
+  VISITANTE: 'Visitante',
+  PRODUCTOR: 'Productor',
+  PROVEEDOR: 'Proveedor',
+  ADMIN: 'Administrador',
+};
 
 /** Orden en que se muestran los grupos en el panel. */
 export const NAV_GROUP_ORDER: readonly NavGroupName[] = [
@@ -18,15 +19,15 @@ export const NAV_GROUP_ORDER: readonly NavGroupName[] = [
   'Cuenta',
 ];
 
-const ALL: DemoRole[] = ['VISITANTE', 'PRODUCTOR', 'PROVEEDOR', 'ADMIN'];
-const LOGGED: DemoRole[] = ['PRODUCTOR', 'PROVEEDOR', 'ADMIN'];
+const ALL: SessionRole[] = ['VISITANTE', 'PRODUCTOR', 'PROVEEDOR', 'ADMIN'];
+const LOGGED: SessionRole[] = ['PRODUCTOR', 'PROVEEDOR', 'ADMIN'];
 
 function item(
   group: NavGroupName,
   label: string,
   path: string,
   icon: IconName,
-  roles: DemoRole[],
+  roles: SessionRole[],
   exact = false,
 ): NavItem {
   return { group, label, path, icon, roles, ...(exact ? { exact } : {}) };

@@ -6,7 +6,7 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 
 ## Commands
 
-- `npm start` (`ng serve`): dev server at http://localhost:4200
+- `npm start` (`ng serve`): dev server at http://localhost:4200, con el proxy `/api` → `http://localhost:3000` (`proxy.conf.json`). Si cambias el proxy hay que reiniciar el servidor.
 - `npm run build` (`ng build`): production build into `dist/`
 - `npm run watch`: development build in watch mode
 - `npm test` (`ng test`): unit tests with Vitest (jsdom). Single file: `ng test --include src/app/app.spec.ts`
@@ -15,22 +15,26 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 
 ## Architecture
 
-- Angular 22 standalone app (no NgModules), bootstrapped from `src/main.ts` with `appConfig` in `src/app/app.config.ts` (providers: global error listeners, `provideRouter(routes)` con restauración de scroll, y `PageTitleStrategy` para `document.title`).
-- Routing lives in `src/app/app.routes.ts`; root component is `App` (`src/app/app.ts`), que solo monta `<app-shell />`. Todas las rutas son lazy (ver "Estructura de la app").
+- Angular 22 standalone app (no NgModules), bootstrapped from `src/main.ts` with `appConfig` in `src/app/app.config.ts` (providers: global error listeners, `provideHttpClient(withInterceptors([authInterceptor]))`, un `provideAppInitializer` que restaura la sesión antes de la primera navegación, `provideRouter(routes)` con restauración de scroll, y `PageTitleStrategy` para `document.title`).
+- Routing lives in `src/app/app.routes.ts`; root component is `App` (`src/app/app.ts`), que solo monta `<router-outlet />`. Todas las rutas son lazy (ver "Estructura de la app").
 - Styling: Tailwind CSS v4 via PostCSS (`.postcssrc.json`), entry in `src/styles.css`. El tema de Material va en `src/material-theme.scss` (ver "Tema y tokens").
 - `.mcp.json` registers the Angular CLI MCP server (`npx @angular/cli mcp`); prefer its tools (`list_projects`, `get_best_practices`, `search_documentation`) when available.
 
 ## Estructura de la app
 
-La app es el frontend del marketplace agropecuario Mini-Croper. Su backend es `agro-app-workspace` (NestJS, API en `:3000`); las reglas de negocio están en `docs/reglas-de-negocio.md` de ese repo. Hoy el frontend es solo diseño: no hay llamadas HTTP, ni sesión, ni guards.
+La app es el frontend del marketplace agropecuario Mini-Croper. Su backend es `agro-app-workspace` (NestJS, API en `:3000`); las reglas de negocio están en `docs/reglas-de-negocio.md` de ese repo. Auth (sesión, login, registro, cuenta y guards) ya está conectado al backend; el resto de pantallas siguen siendo placeholders hasta la SPEC 04.
 
 ```
 src/app/
 ├── core/                 # infraestructura de la app (una sola instancia)
-│   ├── theme/            # ThemeService (claro/oscuro/sistema, clase .app-dark en <html>)
-│   ├── navigation/       # DemoRoleService, NAV_ITEMS, NavigationService, tipos de rol y RouteInfo
-│   ├── layout/           # AppShell (header + panel derecho + contenido), AppHeader, AppSidePanel
-│   └── routing/          # placeholderRoute, RoutePlaceholder, NotFound, PageTitleStrategy
+│   ├── auth/             # SessionService (estado), AuthApi, SessionRefresher, authInterceptor,
+│   │                     # accessGuard, safeReturnUrl, LogoutService y tipos (SessionRole, AuthUser…)
+│   ├── http/             # API_BASE_URL (`/api`), ApiError y toApiError
+│   ├── theme/            # ThemeService y ThemeMenu (claro/oscuro/sistema, clase .app-dark en <html>)
+│   ├── navigation/       # NAV_ITEMS, NavigationService, tipos de nav y RouteInfo
+│   ├── layout/           # AppShell (header + panel derecho + contenido), AppHeader, AppSidePanel,
+│   │                     # AuthLayout (login y registro, pantalla completa sin header ni panel)
+│   └── routing/          # placeholderRoute, RoutePlaceholder, NotFound, Forbidden, PageTitleStrategy
 ├── features/<dominio>/   # <dominio>.routes.ts con las rutas lazy de ese dominio
 │                         # (catalogo, auth, cuenta, pedidos, pagos, proveedor, admin)
 └── shared/ui/            # componentes app-* (únicos que conocen Material/CDK)
@@ -38,9 +42,12 @@ src/app/
 
 - **Rutas en español**, agrupadas por dominio con `loadChildren` y cada pantalla con `loadComponent`. Cada ruta lleva `title` y `data: RouteInfo` (`roles`, `description`, `endpoints` del backend). `placeholderRoute()` crea la ruta con el placeholder; al maquetar una pantalla se cambia su `loadComponent` y se conservan `title` y `data`.
 - **Añadir una pantalla:** ruta en `features/<dominio>/<dominio>.routes.ts` y, si debe verse en el panel, un ítem en `NAV_ITEMS` (`core/navigation/nav.config.ts`). `core/routing/route-map.spec.ts` comprueba que cada ruta tiene título, roles y endpoints, y que cada ítem del panel apunta a una ruta existente que su rol puede ver.
-- **Rol de demo:** el selector del header (`DemoRoleService`, clave `localStorage` `agro:demo-role`) solo filtra el panel. No autentica ni protege rutas: cualquier URL es accesible con cualquier rol.
-- **Layout:** header arriba, panel de navegación a la derecha y la ruta activa al centro. Desde `lg` (1024 px) el panel es fijo; por debajo es un drawer que entra por la derecha (`app-drawer` envuelve todo el shell). Todo debe verse bien a 360, 768 y 1280 px sin scroll horizontal de página.
-- Estado de UI persistido en `localStorage` siempre con `try/catch` y valor por defecto: `agro:theme` y `agro:demo-role`.
+- **Sesión:** `SessionService` guarda el estado con signals (`status`, `user`, `role`, `isAuthenticated`). El access token vive solo en memoria y el refresh token en `localStorage` (`agro:refresh-token`). Al arrancar, el initializer llama a `POST /auth/refresh` si hay refresh token (solo lo borra ante `400`, `401` o `403`; un error de red lo conserva). No hay cookies: los tokens viajan en el cuerpo JSON. El access token no se escribe nunca en disco ni en logs.
+- **HTTP:** `API_BASE_URL` es `/api` y `ng serve` lo reenvía al backend (`:3000`) quitando el prefijo. `authInterceptor` añade `Authorization: Bearer` solo a `/api/*` (nunca a `/auth/login`, `/auth/register` ni `/auth/refresh`), y ante `401` hace un único refresh compartido (con `navigator.locks` entre pestañas) y reintenta una vez. Con el backend apagado el proxy responde `502`: `toApiError` lo trata como "sin conexión" (`status 0`).
+- **Guards:** un único `accessGuard` (`canActivateChild`) en las dos rutas layout lee `RouteInfo.roles`: los cuatro roles = pública; solo `['VISITANTE']` = invitado (con sesión redirige a `/catalogo`); sin `VISITANTE` = privada (sin sesión a `/auth/login?returnUrl=…`, con rol no incluido a `/acceso-denegado`); sin `data.roles` no se comprueba. `returnUrl` se valida con `safeReturnUrl` (solo rutas internas). Es una ayuda de UX: el backend sigue siendo la autoridad.
+- **Login y registro** viven fuera del shell (`AuthLayout`). `/auth/login` acepta `?returnUrl=` y `?aviso=registro|clave|sesion`; el registro de un `PROVEEDOR` muestra una pantalla de solicitud pendiente en la misma ruta.
+- **Layout:** header arriba, panel de navegación a la derecha y la ruta activa al centro (todo lo que no sea `/auth/*`). Desde `lg` (1024 px) el panel es fijo; por debajo es un drawer que entra por la derecha (`app-drawer` envuelve todo el shell). Todo debe verse bien a 360, 768 y 1280 px sin scroll horizontal de página.
+- Estado persistido en `localStorage` siempre con `try/catch` y valor por defecto: `agro:theme` y `agro:refresh-token`. La clave heredada `agro:demo-role` se borra al arrancar (`clearLegacyDemoRole`); no la uses.
 
 ## Tema y tokens
 
@@ -75,8 +82,9 @@ src/app/
 - Está PROHIBIDO importar `@angular/material/*` y `@angular/cdk/*` fuera de `src/app/shared/ui/`. El tema de Material vive en `src/material-theme.scss` y se registra en `angular.json`.
 - Las features y páginas consumen solo los componentes `app-*`, nunca `mat-*` ni utilidades del CDK directamente.
 - No se usa PrimeNG: se eliminó por su licencia (ver `specs/01-skill-ui-component-y-tabla.md`).
-- Componentes disponibles (cada uno con demo en `/ui/<nombre>`): `app-table`, `app-icon`, `app-button`, `app-badge`, `app-card`, `app-page-header`, `app-empty-state`, `app-menu` y `app-drawer`. Antes de crear uno nuevo, revisa si ya existe o si basta ampliar uno.
+- Componentes disponibles (cada uno con demo en `/ui/<nombre>`): `app-table`, `app-icon`, `app-button`, `app-badge`, `app-card`, `app-page-header`, `app-empty-state`, `app-menu`, `app-drawer`, `app-input`, `app-select`, `app-checkbox` y `app-alert`. Antes de crear uno nuevo, revisa si ya existe o si basta ampliar uno.
 - Los controles sin texto visible llevan `ariaLabel`; `app-icon` es decorativo salvo que reciba `label`.
+- `app-input`, `app-select` y `app-checkbox` son controles de Signal Forms: se enlazan con `[formField]` y muestran el primer error con `message` cuando el campo está tocado. Los formularios usan `form(model, schema, { submission })` con `[formRoot]`.
 
 ## Accessibility Requirements
 

@@ -1,53 +1,26 @@
-import { Component, computed, inject, input, output } from '@angular/core';
+import { Component, inject, input, output } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Button } from '../../shared/ui/button/button';
 import { Icon } from '../../shared/ui/icon/icon';
-import { IconName } from '../../shared/ui/icon/icon.types';
 import { Menu } from '../../shared/ui/menu/menu';
 import { MenuItem } from '../../shared/ui/menu/menu.types';
-import { DemoRoleService } from '../navigation/demo-role';
-import { DEMO_ROLE_OPTIONS } from '../navigation/nav.config';
-import { DemoRole } from '../navigation/navigation.types';
-import { ThemeService } from '../theme/theme';
-import { ThemeMode } from '../theme/theme.types';
+import { LogoutService } from '../auth/logout';
+import { SessionService } from '../auth/session';
 
-const ROLE_ITEMS: MenuItem[] = DEMO_ROLE_OPTIONS.map(({ id, label }) => ({ id, label }));
+import { ThemeMenu } from '../theme/theme-menu';
 
-const THEME_ITEMS: MenuItem[] = [
-  { id: 'light', label: 'Claro', icon: 'sun' },
-  { id: 'dark', label: 'Oscuro', icon: 'moon' },
-  { id: 'system', label: 'Sistema', icon: 'monitor' },
-];
-
-const THEME_ICONS: Record<ThemeMode, IconName> = {
-  light: 'sun',
-  dark: 'moon',
-  system: 'monitor',
-};
-
-const GUEST_USER_ITEMS: MenuItem[] = [
-  { id: 'login', label: 'Iniciar sesión', icon: 'log-in' },
-  { id: 'register', label: 'Registrarse', icon: 'plus' },
-];
-
-const LOGGED_USER_ITEMS: MenuItem[] = [
+const USER_ITEMS: MenuItem[] = [
   { id: 'account', label: 'Mi cuenta', icon: 'user' },
   { id: 'logout', label: 'Cerrar sesión', icon: 'log-out', dividerBefore: true },
 ];
 
-const USER_ROUTES: Record<string, string> = {
-  login: '/auth/login',
-  register: '/auth/registro',
-  account: '/cuenta',
-};
-
 /**
- * Cabecera: marca, selector de rol de demo, tema, menú de usuario simulado y, bajo `lg`, el botón
- * que abre el panel de navegación.
+ * Cabecera: marca, tema, acceso del usuario y, bajo `lg`, el botón que abre el panel de
+ * navegación. El visitante ve **Iniciar sesión**; con sesión, un menú con su nombre.
  */
 @Component({
   selector: 'app-header',
-  imports: [RouterLink, Button, Icon, Menu],
+  imports: [RouterLink, Button, Icon, Menu, ThemeMenu],
   template: `
     <header
       class="sticky top-3 z-10 flex h-16 items-center justify-between gap-2 rounded-xl border border-line bg-surface/90 px-3 backdrop-blur sm:px-4"
@@ -66,56 +39,36 @@ const USER_ROUTES: Record<string, string> = {
       </a>
 
       <div class="flex items-center gap-1 sm:gap-2">
-        <!-- Rol de demo: con texto desde sm; solo icono por debajo, para que quepa en 360 px. -->
-        <!-- La visibilidad va en un span: el host de app-menu ya fija su propio display. -->
-        <span class="hidden sm:inline-flex">
-          <app-menu
-            [label]="roleLabel()"
-            [ariaLabel]="'Rol de demo: ' + roleLabel()"
-            icon="users"
-            [items]="roleItems"
-            selectable
-            [selectedId]="demoRole.role()"
-            align="end"
-            variant="secondary"
-            (itemSelect)="onRole($event)"
-          />
-        </span>
-        <span class="inline-flex sm:hidden">
-          <app-menu
-            [label]="'Rol de demo: ' + roleLabel()"
-            icon="users"
-            iconOnly
-            [items]="roleItems"
-            selectable
-            [selectedId]="demoRole.role()"
-            align="end"
-            variant="secondary"
-            (itemSelect)="onRole($event)"
-          />
-        </span>
+        <app-theme-menu />
 
-        <app-menu
-          label="Tema"
-          [icon]="themeIcon()"
-          iconOnly
-          variant="ghost"
-          [items]="themeItems"
-          selectable
-          [selectedId]="theme.mode()"
-          align="end"
-          (itemSelect)="onTheme($event)"
-        />
-
-        <app-menu
-          label="Menú de usuario"
-          icon="user"
-          iconOnly
-          variant="ghost"
-          [items]="userItems()"
-          align="end"
-          (itemSelect)="onUserAction($event)"
-        />
+        @if (session.user(); as user) {
+          <!-- Con nombre desde sm; solo icono por debajo, para que quepa en 360 px. -->
+          <!-- La visibilidad va en un span: el host de app-menu ya fija su propio display. -->
+          <span class="hidden sm:inline-flex">
+            <app-menu
+              [label]="user.nombre"
+              [ariaLabel]="'Menú de usuario: ' + user.nombre"
+              icon="user"
+              [items]="userItems"
+              align="end"
+              variant="secondary"
+              (itemSelect)="onUserAction($event)"
+            />
+          </span>
+          <span class="inline-flex sm:hidden">
+            <app-menu
+              [label]="'Menú de usuario: ' + user.nombre"
+              icon="user"
+              iconOnly
+              [items]="userItems"
+              align="end"
+              variant="ghost"
+              (itemSelect)="onUserAction($event)"
+            />
+          </span>
+        } @else {
+          <a app-button routerLink="/auth/login" size="md">Iniciar sesión</a>
+        }
 
         <button
           app-button
@@ -134,45 +87,23 @@ const USER_ROUTES: Record<string, string> = {
   host: { class: 'block' },
 })
 export class AppHeader {
-  protected readonly theme = inject(ThemeService);
-  protected readonly demoRole = inject(DemoRoleService);
+  protected readonly session = inject(SessionService);
+  private readonly logout = inject(LogoutService);
   private readonly router = inject(Router);
 
-  protected readonly roleItems = ROLE_ITEMS;
-  protected readonly themeItems = THEME_ITEMS;
+  protected readonly userItems = USER_ITEMS;
 
   /** Si el panel (drawer) está abierto; solo afecta al estado del botón. */
   readonly panelOpen = input(false);
   /** Se emite al pulsar el botón del panel. */
   readonly panelToggle = output<void>();
 
-  protected readonly roleLabel = computed(
-    () => ROLE_ITEMS.find((item) => item.id === this.demoRole.role())?.label ?? '',
-  );
-  protected readonly themeIcon = computed(() => THEME_ICONS[this.theme.mode()]);
-  protected readonly userItems = computed(() =>
-    this.demoRole.role() === 'VISITANTE' ? GUEST_USER_ITEMS : LOGGED_USER_ITEMS,
-  );
-
-  // Los ids vienen de `ROLE_ITEMS` y `THEME_ITEMS`; los servicios descartan cualquier otro valor.
-  protected onRole(id: string): void {
-    this.demoRole.setRole(id as DemoRole);
-  }
-
-  protected onTheme(id: string): void {
-    this.theme.setMode(id as ThemeMode);
-  }
-
-  /** Menú de usuario simulado: navega a la pantalla o vuelve a `VISITANTE` al "cerrar sesión". */
+  /** Menú de usuario: va a la cuenta o cierra la sesión. */
   protected onUserAction(id: string): void {
     if (id === 'logout') {
-      this.demoRole.setRole('VISITANTE');
-      void this.router.navigateByUrl('/catalogo');
-      return;
-    }
-    const route = USER_ROUTES[id];
-    if (route) {
-      void this.router.navigateByUrl(route);
+      void this.logout.logout();
+    } else if (id === 'account') {
+      void this.router.navigateByUrl('/cuenta');
     }
   }
 }

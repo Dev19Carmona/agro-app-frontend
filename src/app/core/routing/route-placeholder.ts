@@ -5,7 +5,7 @@ import { map } from 'rxjs';
 import { Badge } from '../../shared/ui/badge/badge';
 import { Card } from '../../shared/ui/card/card';
 import { PageHeader } from '../../shared/ui/page-header/page-header';
-import { DEMO_ROLE_OPTIONS } from '../navigation/nav.config';
+import { SESSION_ROLE_LABELS } from '../navigation/nav.config';
 import { RouteInfo } from '../navigation/navigation.types';
 
 /**
@@ -71,10 +71,10 @@ export class RoutePlaceholder {
 
   protected readonly roleLabels = computed(() => {
     const roles = this.info()?.roles ?? [];
-    if (roles.length === DEMO_ROLE_OPTIONS.length) {
+    if (roles.length === Object.keys(SESSION_ROLE_LABELS).length) {
       return ['Todos'];
     }
-    return roles.map((role) => DEMO_ROLE_OPTIONS.find((option) => option.id === role)?.label ?? role);
+    return roles.map((role) => SESSION_ROLE_LABELS[role] ?? role);
   });
 
   protected readonly params = computed(() => {

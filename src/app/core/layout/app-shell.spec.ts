@@ -1,7 +1,10 @@
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
-import { DemoRoleService } from '../navigation/demo-role';
+import { AppRole } from '../auth/auth.types';
+import { SessionService } from '../auth/session';
 import { ThemeService } from '../theme/theme';
 import { AppShell } from './app-shell';
 
@@ -26,16 +29,25 @@ const settle = (f: ComponentFixture<unknown>) => async () => {
 
 async function setup() {
   localStorage.clear();
-  TestBed.configureTestingModule({ providers: [provideRouter(ROUTES)] });
+  TestBed.configureTestingModule({
+    providers: [provideRouter(ROUTES), provideHttpClient(), provideHttpClientTesting()],
+  });
   const fixture = TestBed.createComponent(AppShell);
   fixture.detectChanges();
   await fixture.whenStable();
   const el = fixture.nativeElement as HTMLElement;
+  const session = TestBed.inject(SessionService);
   return {
     fixture,
     el,
     router: TestBed.inject(Router),
-    role: TestBed.inject(DemoRoleService),
+    session,
+    backend: TestBed.inject(HttpTestingController),
+    signIn: (rol: AppRole = 'PRODUCTOR') =>
+      session.start(
+        { accessToken: 'a', refreshToken: 'r' },
+        { id: '1', email: 'ana@agro.test', nombre: 'Ana Pérez', rol, status: 'ACTIVE' },
+      ),
     theme: TestBed.inject(ThemeService),
     flush: settle(fixture),
     asideLinks: () =>
@@ -67,8 +79,8 @@ describe('AppShell', () => {
     expect(aside.classList.contains('lg:block')).toBe(true);
   });
 
-  it('el panel muestra los ítems del rol de demo y se actualiza al cambiarlo', async () => {
-    const { role, flush, asideLinks } = await setup();
+  it('el panel muestra los ítems del rol de la sesión y se actualiza al iniciar sesión', async () => {
+    const { signIn, flush, asideLinks } = await setup();
     expect(asideLinks()).toEqual([
       'Catálogo',
       'Ofertas',
@@ -77,7 +89,7 @@ describe('AppShell', () => {
       'Registrarse',
     ]);
 
-    role.setRole('PRODUCTOR');
+    signIn('PRODUCTOR');
     await flush();
     expect(asideLinks()).toEqual([
       'Catálogo',
@@ -160,19 +172,12 @@ describe('AppShell', () => {
     expect(document.activeElement).toBe(el.querySelector('main'));
   });
 
-  it('el selector de rol del header cambia el rol de demo', async () => {
-    const { el, role, flush } = await setup();
-    const trigger = el.querySelector('span.sm\\:inline-flex app-menu button') as HTMLButtonElement;
-    expect(trigger.getAttribute('aria-label')).toBe('Rol de demo: Visitante');
-    trigger.click();
-    await flush();
-    const admin = Array.from(document.querySelectorAll<HTMLElement>('[mat-menu-item]')).find((i) =>
-      i.textContent?.includes('Administrador'),
-    ) as HTMLElement;
-    admin.click();
-    await flush();
-    expect(role.role()).toBe('ADMIN');
-    expect(trigger.textContent).toContain('Administrador');
+  it('el visitante ve Iniciar sesión y no hay selector de rol ni menú de usuario', async () => {
+    const { el } = await setup();
+    const login = el.querySelector('app-header a[href="/auth/login"]') as HTMLAnchorElement;
+    expect(login.textContent?.trim()).toBe('Iniciar sesión');
+    expect(el.querySelector('app-header button[aria-label^="Menú de usuario"]')).toBeNull();
+    expect(el.querySelector('app-header button[aria-label^="Rol de demo"]')).toBeNull();
   });
 
   it('el selector de tema cambia el tema', async () => {
@@ -188,24 +193,59 @@ describe('AppShell', () => {
     expect(theme.mode()).toBe('dark');
   });
 
-  it('el menú de usuario cambia según el rol y "Cerrar sesión" vuelve a visitante', async () => {
-    const { el, role, router, flush } = await setup();
-    role.setRole('PRODUCTOR');
-    await flush();
-    const trigger = el.querySelector(
-      'app-menu button[aria-label="Menú de usuario"]',
-    ) as HTMLButtonElement;
-    trigger.click();
-    await flush();
-    const labels = Array.from(document.querySelectorAll('[mat-menu-item]')).map((i) =>
-      i.textContent?.trim(),
-    );
-    expect(labels).toEqual(['Mi cuenta', 'Cerrar sesión']);
+  describe('menú de usuario', () => {
+    async function openMenu(ctx: Awaited<ReturnType<typeof setup>>) {
+      ctx.signIn('PRODUCTOR');
+      await ctx.flush();
+      const trigger = ctx.el.querySelector(
+        'app-header span.sm\\:inline-flex app-menu button',
+      ) as HTMLButtonElement;
+      trigger.click();
+      await ctx.flush();
+      return trigger;
+    }
+    const items = () => Array.from(document.querySelectorAll<HTMLElement>('[mat-menu-item]'));
 
-    (document.querySelectorAll('[mat-menu-item]')[1] as HTMLElement).click();
-    await flush();
-    expect(role.role()).toBe('VISITANTE');
-    expect(router.url).toBe('/catalogo');
+    it('con sesión muestra el nombre, Mi cuenta y Cerrar sesión, y oculta Iniciar sesión', async () => {
+      const ctx = await setup();
+      const trigger = await openMenu(ctx);
+      expect(trigger.textContent).toContain('Ana Pérez');
+      expect(trigger.getAttribute('aria-label')).toBe('Menú de usuario: Ana Pérez');
+      expect(items().map((i) => i.textContent?.trim())).toEqual(['Mi cuenta', 'Cerrar sesión']);
+      expect(ctx.el.querySelector('app-header a[href="/auth/login"]')).toBeNull();
+    });
+
+    it('Mi cuenta navega a /cuenta', async () => {
+      const ctx = await setup();
+      await openMenu(ctx);
+      items()[0].click();
+      await ctx.flush();
+      expect(ctx.router.url).toBe('/cuenta');
+    });
+
+    it('Cerrar sesión envía POST /auth/logout, borra la sesión y va a /catalogo', async () => {
+      const ctx = await setup();
+      await openMenu(ctx);
+      items()[1].click();
+      ctx.backend
+        .expectOne('/api/auth/logout')
+        .flush(null, { status: 204, statusText: 'No Content' });
+      await ctx.flush();
+      expect(ctx.session.status()).toBe('anonymous');
+      expect(localStorage.getItem('agro:refresh-token')).toBeNull();
+      expect(ctx.router.url).toBe('/catalogo');
+    });
+
+    it('Cerrar sesión borra la sesión local aunque la llamada falle', async () => {
+      const ctx = await setup();
+      await openMenu(ctx);
+      items()[1].click();
+      ctx.backend.expectOne('/api/auth/logout').error(new ProgressEvent('error'));
+      await ctx.flush();
+      expect(ctx.session.isAuthenticated()).toBe(false);
+      expect(localStorage.getItem('agro:refresh-token')).toBeNull();
+      expect(ctx.router.url).toBe('/catalogo');
+    });
   });
 
   it('cierra el drawer cuando la pantalla pasa a tamaño grande', async () => {

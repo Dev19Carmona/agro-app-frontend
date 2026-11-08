@@ -6,7 +6,7 @@ import { Icon } from '../../shared/ui/icon/icon';
 let nextId = 0;
 
 /**
- * Navegación principal agrupada según el rol de demo. Se usa tanto en el panel fijo de pantallas
+ * Navegación principal agrupada según el rol de la sesión. Se usa tanto en el panel fijo de pantallas
  * grandes como dentro del drawer en pantallas pequeñas; `navigated` avisa al elegir un enlace
  * para que el drawer se cierre.
  */
