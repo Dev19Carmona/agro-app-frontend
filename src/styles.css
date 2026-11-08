@@ -1,5 +1,143 @@
+/* Fuentes libres auto-hospedadas (equivalentes de las de MongoDB, que son propietarias):
+   Source Serif 4 ~ MongoDB Value Serif, Figtree ~ Söhne, Source Code Pro ~ Söhne Mono. */
+@import '@fontsource-variable/source-serif-4';
+@import '@fontsource-variable/figtree';
+@import '@fontsource/source-code-pro/latin-400.css';
+@import '@fontsource/source-code-pro/latin-600.css';
 @import 'tailwindcss';
 
 /* Modo oscuro controlado por la clase .app-dark (la misma que activa el tema oscuro de Material
    en material-theme.scss). */
 @custom-variant dark (&:where(.app-dark, .app-dark *));
+
+/* ------------------------------------------------------------------------------------------
+   Paleta de mongodb.com/es (valores extraídos de su CSS el 2026-11-08).
+   Claro:  fondo #fdfff5 · superficie #f1f5eb · línea #e4e8e0 · texto #001e2b · apagado #404f54
+   Oscuro: fondo #001e2b · hundido #061621 · superficie #21313a · línea #404f54
+           texto #fdfff5 · apagado #9ea2a1
+   Marca:  verde primavera #00ed64 (solo relleno en claro), verde bosque #00684a (texto/enlace
+           en claro), verde oscuro #014e3d (hover), azul #006cfa (acento informativo).
+   Contraste AA: en claro el texto de marca es #00684a (≈6.4:1 sobre #fdfff5); el verde
+   #00ed64 se usa como relleno con texto #001e2b (≈11:1). En oscuro el verde #00ed64 sí
+   funciona como texto sobre #001e2b (≈11:1).
+   ------------------------------------------------------------------------------------------ */
+:root {
+  --c-bg: #fdfff5;
+  --c-sunken: #f1f5eb;
+  --c-surface: #ffffff;
+  --c-line: #e4e8e0;
+  --c-line-strong: #9ea2a1;
+  --c-fg: #001e2b;
+  --c-fg-muted: #404f54;
+  --c-brand: #00ed64;
+  --c-brand-hover: #00aa57;
+  --c-on-brand: #001e2b;
+  --c-brand-text: #00684a;
+  --c-brand-text-hover: #014e3d;
+  --c-brand-soft: #e9ff99;
+  --c-info: #006cfa;
+  --c-danger: #b42318;
+  --c-warning: #8a5a00;
+}
+
+.app-dark {
+  --c-bg: #001e2b;
+  --c-sunken: #061621;
+  --c-surface: #21313a;
+  --c-line: #404f54;
+  --c-line-strong: #616c6d;
+  --c-fg: #fdfff5;
+  --c-fg-muted: #9ea2a1;
+  --c-brand: #00ed64;
+  --c-brand-hover: #0ad05b;
+  --c-on-brand: #001e2b;
+  --c-brand-text: #00ed64;
+  --c-brand-text-hover: #e9ff99;
+  --c-brand-soft: #014e3d;
+  --c-info: #6fa8ff;
+  --c-danger: #ff8a80;
+  --c-warning: #ffc857;
+}
+
+/* Tokens expuestos a Tailwind: bg-bg, bg-surface, text-fg, border-line, bg-brand, etc.
+   `inline` mantiene la referencia a las variables, así el modo oscuro las redefine. */
+@theme inline {
+  --color-bg: var(--c-bg);
+  --color-sunken: var(--c-sunken);
+  --color-surface: var(--c-surface);
+  --color-line: var(--c-line);
+  --color-line-strong: var(--c-line-strong);
+  --color-fg: var(--c-fg);
+  --color-fg-muted: var(--c-fg-muted);
+  --color-brand: var(--c-brand);
+  --color-brand-hover: var(--c-brand-hover);
+  --color-on-brand: var(--c-on-brand);
+  --color-brand-text: var(--c-brand-text);
+  --color-brand-text-hover: var(--c-brand-text-hover);
+  --color-brand-soft: var(--c-brand-soft);
+  --color-info: var(--c-info);
+  --color-danger: var(--c-danger);
+  --color-warning: var(--c-warning);
+}
+
+@theme {
+  /* Tipografía */
+  --font-sans: 'Figtree Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Source Serif 4 Variable', ui-serif, Georgia, serif;
+  --font-mono: 'Source Code Pro', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  /* Bordes redondeados en todo: botones y badges en pill, tarjetas y panel en lg/xl,
+     controles en md. Sustituyen la escala por defecto de Tailwind. */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-pill: 9999px;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--c-bg);
+    color: var(--c-fg);
+    font-family: var(--font-sans);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    overflow-wrap: break-word;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  code,
+  kbd,
+  pre {
+    font-family: var(--font-mono);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--c-info);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

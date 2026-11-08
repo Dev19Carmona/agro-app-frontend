@@ -2,19 +2,58 @@
 
 // Tema base de Angular Material (M3). Los tokens se emiten como variables CSS `--mat-sys-*`.
 // Tailwind vive en `styles.css`; este archivo se registra aparte en `angular.json`.
+// Los colores salen de las variables `--c-*` de `styles.css` (paleta de mongodb.com/es), así
+// Material y Tailwind comparten un único origen de color en ambos modos.
 html {
   color-scheme: light;
 
   @include mat.theme(
     (
-      color: mat.$azure-palette,
-      typography: (system-ui, sans-serif),
+      color: mat.$green-palette,
+      typography: (
+        plain-family: 'Figtree Variable, system-ui, sans-serif',
+        brand-family: 'Source Serif 4 Variable, Georgia, serif',
+      ),
       density: 0,
     )
   );
+
+  // Color: se sobrescriben los roles de superficie, texto y marca con los tokens propios.
+  --mat-sys-primary: var(--c-brand-text);
+  --mat-sys-on-primary: var(--c-bg);
+  --mat-sys-primary-container: var(--c-brand);
+  --mat-sys-on-primary-container: var(--c-on-brand);
+  --mat-sys-secondary: var(--c-brand-text);
+  --mat-sys-on-secondary: var(--c-bg);
+  --mat-sys-secondary-container: var(--c-brand-soft);
+  --mat-sys-on-secondary-container: var(--c-fg);
+  --mat-sys-tertiary: var(--c-info);
+  --mat-sys-error: var(--c-danger);
+  --mat-sys-background: var(--c-bg);
+  --mat-sys-on-background: var(--c-fg);
+  --mat-sys-surface: var(--c-bg);
+  --mat-sys-on-surface: var(--c-fg);
+  --mat-sys-on-surface-variant: var(--c-fg-muted);
+  --mat-sys-surface-variant: var(--c-sunken);
+  --mat-sys-surface-container-lowest: var(--c-surface);
+  --mat-sys-surface-container-low: var(--c-surface);
+  --mat-sys-surface-container: var(--c-surface);
+  --mat-sys-surface-container-high: var(--c-surface);
+  --mat-sys-surface-container-highest: var(--c-sunken);
+  --mat-sys-outline: var(--c-line-strong);
+  --mat-sys-outline-variant: var(--c-line);
+
+  // Bordes redondeados en todo (escala del token --radius-* de Tailwind).
+  --mat-sys-corner-extra-small: var(--radius-sm);
+  --mat-sys-corner-small: var(--radius-sm);
+  --mat-sys-corner-medium: var(--radius-md);
+  --mat-sys-corner-large: var(--radius-lg);
+  --mat-sys-corner-extra-large: var(--radius-xl);
+  --mat-sys-corner-full: var(--radius-pill);
 }
 
 // Modo oscuro controlado por la clase `.app-dark`, la misma que usa la variante `dark` de Tailwind.
+// Las variables `--c-*` ya cambian bajo esa clase; aquí solo se avisa al navegador.
 html.app-dark {
   color-scheme: dark;
 }

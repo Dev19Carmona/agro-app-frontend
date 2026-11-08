@@ -1,6 +1,18 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, computed, contentChildren, input, model, output, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  afterNextRender,
+  computed,
+  contentChildren,
+  inject,
+  input,
+  model,
+  output,
+  signal,
+} from '@angular/core';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatRadioButton } from '@angular/material/radio';
 import { MatTableModule } from '@angular/material/table';
@@ -35,6 +47,9 @@ function compareValues(a: unknown, b: unknown): number {
   imports: [MatTableModule, MatCheckbox, MatRadioButton, NgTemplateOutlet],
   templateUrl: './table.html',
   styleUrl: './table.css',
+  // Si la tabla desborda y hace scroll horizontal, el contenedor debe poder enfocarse para que
+  // quien usa teclado la desplace con las flechas (WCAG 2.1.1). Sin desbordamiento no es tab stop.
+  host: { '[attr.tabindex]': 'scrollable() ? 0 : null' },
 })
 export class Table<T = unknown> {
   readonly data = input<T[]>([]);
@@ -66,6 +81,28 @@ export class Table<T = unknown> {
 
   protected readonly radioName = `app-table-radio-${nextId++}`;
   protected readonly focusedIndex = signal(0);
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
+  private readonly destroyRef = inject(DestroyRef);
+  /** `true` cuando el contenido es más ancho que el contenedor. */
+  protected readonly scrollable = signal(false);
+
+  constructor() {
+    afterNextRender(() => {
+      if (typeof ResizeObserver === 'undefined') {
+        return;
+      }
+      const update = () => this.scrollable.set(this.host.scrollWidth > this.host.clientWidth);
+      const observer = new ResizeObserver(update);
+      observer.observe(this.host);
+      const table = this.host.querySelector('table');
+      if (table) {
+        observer.observe(table);
+      }
+      this.destroyRef.onDestroy(() => observer.disconnect());
+      update();
+    });
+  }
 
   protected readonly cellTemplates = computed(
     () => new Map(this.cells().map((cell) => [cell.field(), cell.template])),
