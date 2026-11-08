@@ -1,3 +1,10 @@
-/* You can add global styles to this file, and also import other style files */
+/* Orden de capas: PrimeNG queda después de la base de Tailwind y antes de sus utilidades,
+   de modo que las clases de Tailwind puedan sobrescribir estilos de PrimeNG. */
+@layer theme, base, primeng, components, utilities;
 
 @import 'tailwindcss';
+@import 'primeicons/primeicons.css';
+@plugin 'tailwindcss-primeui';
+
+/* Modo oscuro controlado por la clase .app-dark (coincide con darkModeSelector de PrimeNG). */
+@custom-variant dark (&:where(.app-dark, .app-dark *));
