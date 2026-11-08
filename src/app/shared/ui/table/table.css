@@ -1,3 +1,11 @@
+/* Responsive: si la tabla es más ancha que su contenedor, hace scroll horizontal ella misma y no
+   la página. */
+:host {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
 /* Densidad: sobrescribe los tokens de Material para `mat-table`. `medium` usa los valores base. */
 .app-table-small {
   --mat-table-row-item-container-height: 36px;

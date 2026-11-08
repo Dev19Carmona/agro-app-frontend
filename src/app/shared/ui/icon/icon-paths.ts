@@ -1,0 +1,60 @@
+/**
+ * Iconos SVG inline (viewBox 24x24, trazo). Cada icono es una lista de paths, así la plantilla
+ * los pinta con `@for` sin `innerHTML`. Sin fuentes ni librerías de iconos externas.
+ */
+export const ICON_PATHS = {
+  menu: ['M4 6h16', 'M4 12h16', 'M4 18h16'],
+  close: ['M6 6l12 12', 'M18 6L6 18'],
+  sun: [
+    'M12 8a4 4 0 1 0 0 8a4 4 0 1 0 0-8z',
+    'M12 2v2',
+    'M12 20v2',
+    'M4.9 4.9l1.4 1.4',
+    'M17.7 17.7l1.4 1.4',
+    'M2 12h2',
+    'M20 12h2',
+    'M4.9 19.1l1.4-1.4',
+    'M17.7 6.3l1.4-1.4',
+  ],
+  moon: ['M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z'],
+  monitor: [
+    'M5 4h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z',
+    'M8 21h8',
+    'M12 17v4',
+  ],
+  'chevron-down': ['M6 9l6 6 6-6'],
+  'chevron-right': ['M9 6l6 6-6 6'],
+  'arrow-left': ['M19 12H5', 'M12 19l-7-7 7-7'],
+  search: ['M11 4a7 7 0 1 0 0 14a7 7 0 1 0 0-14z', 'M20 20l-4-4'],
+  plus: ['M12 5v14', 'M5 12h14'],
+  check: ['M5 12.5l4.5 4.5L19 7'],
+  user: ['M12 4a4 4 0 1 0 0 8a4 4 0 1 0 0-8z', 'M4 20a8 8 0 0 1 16 0'],
+  users: [
+    'M9 5a3.5 3.5 0 1 0 0 7a3.5 3.5 0 1 0 0-7z',
+    'M2.5 19a6.5 6.5 0 0 1 13 0',
+    'M16 5.3a3.5 3.5 0 0 1 0 6.4',
+    'M18 13.2a6.5 6.5 0 0 1 3.5 5.8',
+  ],
+  cart: ['M3 4h2.5l2 11h10l2-8H7', 'M9 20h.01', 'M17 20h.01'],
+  store: [
+    'M4 9l1.5-5h13L20 9',
+    'M4 9a3 3 0 0 0 5.3 1.9 3 3 0 0 0 5.4 0A3 3 0 0 0 20 9',
+    'M5 13v7h14v-7',
+    'M10 20v-4h4v4',
+  ],
+  package: ['M12 3l8 4.5v9L12 21l-8-4.5v-9z', 'M4 7.5l8 4.5 8-4.5', 'M12 12v9'],
+  tag: ['M3 12V4h8l10 10-8 8z', 'M7.5 8h.01'],
+  'credit-card': [
+    'M4 6h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1z',
+    'M3 10h18',
+  ],
+  receipt: ['M6 3h12v18l-3-2-3 2-3-2-3 2z', 'M9 8h6', 'M9 12h6'],
+  grid: ['M4 4h6v6H4z', 'M14 4h6v6h-6z', 'M4 14h6v6H4z', 'M14 14h6v6h-6z'],
+  'log-in': ['M14 4h5v16h-5', 'M4 12h11', 'M11 8l4 4-4 4'],
+  'log-out': ['M10 4H5v16h5', 'M9 12h11', 'M16 8l4 4-4 4'],
+  inbox: ['M3 13l3-8h12l3 8', 'M3 13v6h18v-6', 'M3 13h5a4 4 0 0 0 8 0h5'],
+  alert: ['M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18z', 'M12 8v5', 'M12 16h.01'],
+  shield: ['M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6z'],
+  home: ['M4 11l8-7 8 7', 'M6 10v10h12V10'],
+  leaf: ['M5 19c0-8 5-14 15-14 0 10-6 15-14 15', 'M5 19c2-5 5-8 9-10'],
+} as const satisfies Record<string, readonly string[]>;

@@ -15,10 +15,41 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 
 ## Architecture
 
-- Angular 22 standalone app (no NgModules), bootstrapped from `src/main.ts` with `appConfig` in `src/app/app.config.ts` (providers: global error listeners, `provideRouter(routes)`).
-- Routing lives in `src/app/app.routes.ts`; root component is `App` (`src/app/app.ts`, with separate `.html`/`.css`). The project is a fresh scaffold, so feature routes should be added there and lazy loaded.
-- Styling: Tailwind CSS v4 via PostCSS (`.postcssrc.json`), entry in `src/styles.css`.
+- Angular 22 standalone app (no NgModules), bootstrapped from `src/main.ts` with `appConfig` in `src/app/app.config.ts` (providers: global error listeners, `provideRouter(routes)` con restauración de scroll, y `PageTitleStrategy` para `document.title`).
+- Routing lives in `src/app/app.routes.ts`; root component is `App` (`src/app/app.ts`), que solo monta `<app-shell />`. Todas las rutas son lazy (ver "Estructura de la app").
+- Styling: Tailwind CSS v4 via PostCSS (`.postcssrc.json`), entry in `src/styles.css`. El tema de Material va en `src/material-theme.scss` (ver "Tema y tokens").
 - `.mcp.json` registers the Angular CLI MCP server (`npx @angular/cli mcp`); prefer its tools (`list_projects`, `get_best_practices`, `search_documentation`) when available.
+
+## Estructura de la app
+
+La app es el frontend del marketplace agropecuario Mini-Croper. Su backend es `agro-app-workspace` (NestJS, API en `:3000`); las reglas de negocio están en `docs/reglas-de-negocio.md` de ese repo. Hoy el frontend es solo diseño: no hay llamadas HTTP, ni sesión, ni guards.
+
+```
+src/app/
+├── core/                 # infraestructura de la app (una sola instancia)
+│   ├── theme/            # ThemeService (claro/oscuro/sistema, clase .app-dark en <html>)
+│   ├── navigation/       # DemoRoleService, NAV_ITEMS, NavigationService, tipos de rol y RouteInfo
+│   ├── layout/           # AppShell (header + panel derecho + contenido), AppHeader, AppSidePanel
+│   └── routing/          # placeholderRoute, RoutePlaceholder, NotFound, PageTitleStrategy
+├── features/<dominio>/   # <dominio>.routes.ts con las rutas lazy de ese dominio
+│                         # (catalogo, auth, cuenta, pedidos, pagos, proveedor, admin)
+└── shared/ui/            # componentes app-* (únicos que conocen Material/CDK)
+```
+
+- **Rutas en español**, agrupadas por dominio con `loadChildren` y cada pantalla con `loadComponent`. Cada ruta lleva `title` y `data: RouteInfo` (`roles`, `description`, `endpoints` del backend). `placeholderRoute()` crea la ruta con el placeholder; al maquetar una pantalla se cambia su `loadComponent` y se conservan `title` y `data`.
+- **Añadir una pantalla:** ruta en `features/<dominio>/<dominio>.routes.ts` y, si debe verse en el panel, un ítem en `NAV_ITEMS` (`core/navigation/nav.config.ts`). `core/routing/route-map.spec.ts` comprueba que cada ruta tiene título, roles y endpoints, y que cada ítem del panel apunta a una ruta existente que su rol puede ver.
+- **Rol de demo:** el selector del header (`DemoRoleService`, clave `localStorage` `agro:demo-role`) solo filtra el panel. No autentica ni protege rutas: cualquier URL es accesible con cualquier rol.
+- **Layout:** header arriba, panel de navegación a la derecha y la ruta activa al centro. Desde `lg` (1024 px) el panel es fijo; por debajo es un drawer que entra por la derecha (`app-drawer` envuelve todo el shell). Todo debe verse bien a 360, 768 y 1280 px sin scroll horizontal de página.
+- Estado de UI persistido en `localStorage` siempre con `try/catch` y valor por defecto: `agro:theme` y `agro:demo-role`.
+
+## Tema y tokens
+
+- Paleta y tipografía de mongodb.com/es, con fuentes libres equivalentes auto-hospedadas (`@fontsource*`): **Source Serif 4** (títulos `h1`–`h3`, `font-serif`), **Figtree** (cuerpo, `font-sans`) y **Source Code Pro** (`font-mono`). No se cargan fuentes de Google Fonts.
+- Los colores son variables CSS `--c-*` definidas en `src/styles.css` para claro (`:root`) y oscuro (`.app-dark`), expuestas a Tailwind: `bg-bg`, `bg-surface`, `bg-sunken`, `text-fg`, `text-fg-muted`, `border-line`, `border-line-strong`, `bg-brand`, `text-on-brand`, `text-brand-text`, `bg-brand-soft`, `text-info`, `text-danger`, `text-warning`. **Usa estos tokens; no hardcodees colores** ni uses `dark:` para cambiar de color (el token ya cambia solo).
+- En claro el verde `#00ed64` solo va como relleno con texto `text-on-brand`; como texto sobre fondo claro se usa `text-brand-text`.
+- Bordes redondeados en todo: `rounded-sm` (8 px), `rounded-md` (12), `rounded-lg` (16), `rounded-xl` (24) y `rounded-pill`. Botones y badges son `pill`, tarjetas y panel `xl`, controles `md`. Material los recibe mediante `--mat-sys-corner-*` en `src/material-theme.scss`.
+- Los roles de Material (`--mat-sys-*`) se sobrescriben con los mismos tokens, así Tailwind y Material comparten un único origen de color.
+- Al comprobar contraste con AXE, espera a que termine `transition-colors` tras cambiar de tema (≈ 700 ms) o saldrán falsos positivos.
 
 ## TypeScript Best Practices
 
@@ -44,6 +75,8 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Está PROHIBIDO importar `@angular/material/*` y `@angular/cdk/*` fuera de `src/app/shared/ui/`. El tema de Material vive en `src/material-theme.scss` y se registra en `angular.json`.
 - Las features y páginas consumen solo los componentes `app-*`, nunca `mat-*` ni utilidades del CDK directamente.
 - No se usa PrimeNG: se eliminó por su licencia (ver `specs/01-skill-ui-component-y-tabla.md`).
+- Componentes disponibles (cada uno con demo en `/ui/<nombre>`): `app-table`, `app-icon`, `app-button`, `app-badge`, `app-card`, `app-page-header`, `app-empty-state`, `app-menu` y `app-drawer`. Antes de crear uno nuevo, revisa si ya existe o si basta ampliar uno.
+- Los controles sin texto visible llevan `ariaLabel`; `app-icon` es decorativo salvo que reciba `label`.
 
 ## Accessibility Requirements
 

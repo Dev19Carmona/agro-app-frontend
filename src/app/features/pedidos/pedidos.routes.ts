@@ -1,0 +1,46 @@
+import { Routes } from '@angular/router';
+import { placeholderRoute } from '../../core/routing/placeholder-route';
+
+const PRODUCTOR: ('PRODUCTOR')[] = ['PRODUCTOR'];
+
+/**
+ * Compras del productor: carrito, checkout y pedidos. Se montan en la raíz (`/carrito`,
+ * `/checkout`, `/pedidos…`) porque son tres rutas de primer nivel de un mismo flujo.
+ */
+export const PEDIDOS_ROUTES: Routes = [
+  placeholderRoute('carrito', 'Carrito', {
+    roles: PRODUCTOR,
+    description:
+      'Líneas del carrito (máximo 50, de 1 a 1000 unidades cada una) con precio y disponibilidad leídos del catálogo, y total estimado.',
+    endpoints: [
+      'GET /orders/cart',
+      'PUT /orders/cart/items/:variantId',
+      'DELETE /orders/cart/items/:variantId',
+      'DELETE /orders/cart',
+    ],
+  }),
+  placeholderRoute('checkout', 'Confirmar pedido', {
+    roles: PRODUCTOR,
+    description:
+      'Resumen del pedido dividido por tienda y confirmación. El precio se toma siempre del catálogo; el envío usa una clave de idempotencia.',
+    endpoints: ['POST /orders/checkout'],
+  }),
+  placeholderRoute('pedidos', 'Mis pedidos', {
+    roles: PRODUCTOR,
+    description:
+      'Historial de pedidos con su estado: pendiente, esperando pago, confirmado o cancelado.',
+    endpoints: ['GET /orders'],
+  }),
+  placeholderRoute('pedidos/:id', 'Detalle de pedido', {
+    roles: PRODUCTOR,
+    description:
+      'Ítems con su snapshot (nombre, presentación y precio), sub-pedidos por tienda, estado y tiempo restante para pagar (15 minutos).',
+    endpoints: ['GET /orders/:id'],
+  }),
+  placeholderRoute('pedidos/:id/pago', 'Pagar pedido', {
+    roles: PRODUCTOR,
+    description:
+      'Elección del método (tarjeta, PSE o Nequi) y pago con un token de prueba. Muestra el resultado y permite reintentar tras un rechazo o un error mientras el pedido no venza.',
+    endpoints: ['POST /payments'],
+  }),
+];
