@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { Button } from '../../shared/ui/button/button';
-import { PageHeader } from '../../shared/ui/page-header/page-header';
+import { Button } from '../../../../shared/ui/button/button';
+import { PageHeader } from '../../../../shared/ui/page-header/page-header';
 
 /** Página 404: cualquier URL que no coincide con una ruta. */
 @Component({

@@ -3,9 +3,9 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
-import { AppRole } from '../auth/auth.types';
-import { SessionService } from '../auth/session';
-import { ThemeService } from '../theme/theme';
+import { AppRole } from '../../../auth';
+import { SessionService } from '../../../auth';
+import { ThemeService } from '../../../theme';
 import { AppShell } from './app-shell';
 
 @Component({ template: 'página' })

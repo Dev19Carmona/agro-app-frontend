@@ -1,9 +1,9 @@
 import { TestBed } from '@angular/core/testing';
-import { SessionService } from '../auth/session';
-import { NAV_GROUP_ORDER, NAV_ITEMS, SESSION_ROLE_LABELS } from './nav.config';
+import { SessionService } from '../../auth';
+import { NAV_GROUP_ORDER, NAV_ITEMS, SESSION_ROLE_LABELS } from '../config/nav.config';
 import { NavigationService } from './navigation';
-import { AppRole, SessionRole } from '../auth/auth.types';
-import { ICON_PATHS } from '../../shared/ui/icon/icon-paths';
+import { AppRole, SessionRole } from '../../auth';
+import { ICON_PATHS } from '../../../shared/ui/icon/icon-paths';
 
 function signIn(role: AppRole): void {
   TestBed.inject(SessionService).start(

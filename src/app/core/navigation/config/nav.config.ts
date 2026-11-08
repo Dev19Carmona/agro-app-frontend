@@ -1,6 +1,6 @@
-import type { IconName } from '../../shared/ui/icon/icon.types';
-import type { SessionRole } from '../auth/auth.types';
-import type { NavGroupName, NavItem } from './navigation.types';
+import type { IconName } from '../../../shared/ui/icon/icon.types';
+import type { SessionRole } from '../../auth';
+import type { NavGroupName, NavItem } from '../models/navigation.types';
 
 /** Nombre legible de cada rol de la sesión. */
 export const SESSION_ROLE_LABELS: Readonly<Record<SessionRole, string>> = {

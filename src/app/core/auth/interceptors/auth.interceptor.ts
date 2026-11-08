@@ -7,9 +7,9 @@ import {
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, from, switchMap, throwError } from 'rxjs';
-import { API_BASE_URL } from '../http/api-config';
-import { SessionService } from './session';
-import { SessionRefresher, isInvalidRefresh } from './session-refresher';
+import { API_BASE_URL } from '../../http';
+import { SessionService } from '../services/session';
+import { SessionRefresher, isInvalidRefresh } from '../services/session-refresher';
 
 /** Endpoints de `/auth` que no llevan `Authorization` ni se reintentan ante `401`. */
 const PUBLIC_AUTH_PATHS: readonly string[] = ['/auth/login', '/auth/register', '/auth/refresh'];

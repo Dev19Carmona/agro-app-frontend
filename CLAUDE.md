@@ -22,32 +22,59 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 
 ## Estructura de la app
 
-La app es el frontend del marketplace agropecuario Mini-Croper. Su backend es `agro-app-workspace` (NestJS, API en `:3000`); las reglas de negocio están en `docs/reglas-de-negocio.md` de ese repo. Auth (sesión, login, registro, cuenta y guards) ya está conectado al backend; el resto de pantallas siguen siendo placeholders hasta la SPEC 04.
+La app es el frontend del marketplace agropecuario Mini-Croper. Su backend es `agro-app-workspace` (NestJS, API en `:3000`); las reglas de negocio están en `docs/reglas-de-negocio.md` de ese repo. Auth (sesión, login, registro, cuenta y guards) ya está conectado al backend; el resto de pantallas siguen siendo placeholders hasta la SPEC 05.
 
 ```
 src/app/
 ├── core/                 # infraestructura de la app (una sola instancia)
-│   ├── auth/             # SessionService (estado), AuthApi, SessionRefresher, authInterceptor,
-│   │                     # accessGuard, safeReturnUrl, LogoutService y tipos (SessionRole, AuthUser…)
-│   ├── http/             # API_BASE_URL (`/api`), ApiError y toApiError
+│   ├── http/             # API_BASE_URL (`/api`), ApiError, toApiError
+│   ├── auth/             # SessionService, AuthApi, SessionRefresher, LogoutService, authInterceptor,
+│   │                     # safeReturnUrl, mensajes y validación de auth, tipos (SessionRole, AuthUser…)
 │   ├── theme/            # ThemeService y ThemeMenu (claro/oscuro/sistema, clase .app-dark en <html>)
 │   ├── navigation/       # NAV_ITEMS, NavigationService, tipos de nav y RouteInfo
-│   ├── layout/           # AppShell (header + panel derecho + contenido), AppHeader, AppSidePanel,
-│   │                     # AuthLayout (login y registro, pantalla completa sin header ni panel)
-│   └── routing/          # placeholderRoute, RoutePlaceholder, NotFound, Forbidden, PageTitleStrategy
-├── features/<dominio>/   # <dominio>.routes.ts con las rutas lazy de ese dominio
+│   ├── routing/          # accessGuard, PageTitleStrategy, placeholderRoute, RoutePlaceholder,
+│   │                     # Forbidden y NotFound
+│   └── layout/           # AppShell, AppHeader, AppSidePanel y AuthLayout (sin index.ts)
+├── features/<dominio>/   # index.ts + <dominio>.routes.ts (+ pages/<pantalla>/ si ya está maquetada)
 │                         # (catalogo, auth, cuenta, pedidos, pagos, proveedor, admin)
 └── shared/ui/            # componentes app-* (únicos que conocen Material/CDK)
 ```
 
+Detalle de carpetas, `index.ts` y dependencias en "Estructura de un módulo".
+
 - **Rutas en español**, agrupadas por dominio con `loadChildren` y cada pantalla con `loadComponent`. Cada ruta lleva `title` y `data: RouteInfo` (`roles`, `description`, `endpoints` del backend). `placeholderRoute()` crea la ruta con el placeholder; al maquetar una pantalla se cambia su `loadComponent` y se conservan `title` y `data`.
-- **Añadir una pantalla:** ruta en `features/<dominio>/<dominio>.routes.ts` y, si debe verse en el panel, un ítem en `NAV_ITEMS` (`core/navigation/nav.config.ts`). `core/routing/route-map.spec.ts` comprueba que cada ruta tiene título, roles y endpoints, y que cada ítem del panel apunta a una ruta existente que su rol puede ver.
+- **Añadir una pantalla:** ruta en `features/<dominio>/<dominio>.routes.ts` y, si debe verse en el panel, un ítem en `NAV_ITEMS` (`core/navigation/config/nav.config.ts`). `core/routing/route-map.spec.ts` comprueba que cada ruta tiene título, roles y endpoints, y que cada ítem del panel apunta a una ruta existente que su rol puede ver.
 - **Sesión:** `SessionService` guarda el estado con signals (`status`, `user`, `role`, `isAuthenticated`). El access token vive solo en memoria y el refresh token en `localStorage` (`agro:refresh-token`). Al arrancar, el initializer llama a `POST /auth/refresh` si hay refresh token (solo lo borra ante `400`, `401` o `403`; un error de red lo conserva). No hay cookies: los tokens viajan en el cuerpo JSON. El access token no se escribe nunca en disco ni en logs.
 - **HTTP:** `API_BASE_URL` es `/api` y `ng serve` lo reenvía al backend (`:3000`) quitando el prefijo. `authInterceptor` añade `Authorization: Bearer` solo a `/api/*` (nunca a `/auth/login`, `/auth/register` ni `/auth/refresh`), y ante `401` hace un único refresh compartido (con `navigator.locks` entre pestañas) y reintenta una vez. Con el backend apagado el proxy responde `502`: `toApiError` lo trata como "sin conexión" (`status 0`).
 - **Guards:** un único `accessGuard` (`canActivateChild`) en las dos rutas layout lee `RouteInfo.roles`: los cuatro roles = pública; solo `['VISITANTE']` = invitado (con sesión redirige a `/catalogo`); sin `VISITANTE` = privada (sin sesión a `/auth/login?returnUrl=…`, con rol no incluido a `/acceso-denegado`); sin `data.roles` no se comprueba. `returnUrl` se valida con `safeReturnUrl` (solo rutas internas). Es una ayuda de UX: el backend sigue siendo la autoridad.
 - **Login y registro** viven fuera del shell (`AuthLayout`). `/auth/login` acepta `?returnUrl=` y `?aviso=registro|clave|sesion`; el registro de un `PROVEEDOR` muestra una pantalla de solicitud pendiente en la misma ruta.
 - **Layout:** header arriba, panel de navegación a la derecha y la ruta activa al centro (todo lo que no sea `/auth/*`). Desde `lg` (1024 px) el panel es fijo; por debajo es un drawer que entra por la derecha (`app-drawer` envuelve todo el shell). Todo debe verse bien a 360, 768 y 1280 px sin scroll horizontal de página.
 - Estado persistido en `localStorage` siempre con `try/catch` y valor por defecto: `agro:theme` y `agro:refresh-token`. La clave heredada `agro:demo-role` se borra al arrancar (`clearLegacyDemoRole`); no la uses.
+
+## Estructura de un módulo
+
+Cada módulo (`core/<modulo>/` o `features/<dominio>/`) usa carpetas por tipo de archivo, creadas **solo cuando tienen contenido** (nunca vacías ni `.gitkeep`):
+
+```text
+<modulo>/
+  index.ts                  # API pública (exportaciones nombradas, nunca `export *`)
+  <dominio>.routes.ts       # solo en features: rutas lazy del dominio
+  components/<nombre>/      # componentes que no son una ruta
+  pages/<nombre>/           # pantallas que se cargan con loadComponent
+  services/                 # @Service / @Injectable (clientes HTTP, estrategias del router)
+  guards/                   # CanActivate*, CanMatch*
+  interceptors/             # HttpInterceptorFn
+  models/                   # tipos, interfaces y constantes de dominio
+  utils/                    # funciones puras sin inyección de dependencias
+  config/                   # InjectionToken y datos estáticos de configuración
+```
+
+- En la raíz del módulo solo van `index.ts`, `<dominio>.routes.ts` y los specs transversales (hoy `core/routing/route-map.spec.ts` y `routing.spec.ts`). Una carpeta nueva fuera de la lista solo se añade si el módulo la necesita, y se agrega aquí en el mismo cambio.
+- Cada componente y cada pantalla tiene su propia carpeta. Los `*.spec.ts` van junto al archivo que prueban. Los nombres de archivo no cambian al moverlos; usa `git mv`.
+- **`index.ts`:** dentro de un módulo se importa por ruta relativa al archivo; desde fuera (otro módulo, una feature, `app.config.ts`, `app.routes.ts`, specs) solo por `index.ts` (`from '../auth'`). Si algo debe ser público, se añade al `index.ts`.
+- **Excepción lazy:** un `index.ts` nunca reexporta pantallas ni layouts cargados con `loadComponent` (Forbidden, NotFound, RoutePlaceholder, Login, Registro, Cuenta, AppShell, AuthLayout…). Se cargan con `import()` directo a su archivo para no meterlos en el bundle principal. `core/layout` no tiene `index.ts`. Las features exponen solo su constante de rutas (`import('./features/<dominio>')`).
+- **Dependencias:** `http` ← `auth` ← `navigation` ← `routing` ← `layout`, con `theme` independiente (`layout` puede usarlo). `core` y `features` pueden usar `shared/ui`; una feature usa `core` pero nunca otra feature; `core` nunca importa de `features`. Lo compartido entre features va a `core` (p. ej. `core/auth/utils/`).
+- `shared/ui`: una carpeta por componente (`<nombre>.ts`, `.types.ts`, `.spec.ts`, `-demo.ts`), sin barrel; `form-control/` solo contiene tipos compartidos.
 
 ## Tema y tokens
 

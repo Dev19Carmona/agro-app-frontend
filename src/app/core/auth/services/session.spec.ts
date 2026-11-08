@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { AuthUser, REFRESH_TOKEN_STORAGE_KEY } from './auth.types';
+import { AuthUser, REFRESH_TOKEN_STORAGE_KEY } from '../models/auth.types';
 import { SessionService } from './session';
 
 const USER: AuthUser = {

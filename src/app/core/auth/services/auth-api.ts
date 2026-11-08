@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Service, inject } from '@angular/core';
 import { Observable, catchError, throwError } from 'rxjs';
-import { API_BASE_URL } from '../http/api-config';
-import { toApiError } from '../http/to-api-error';
+import { API_BASE_URL } from '../../http';
+import { toApiError } from '../../http';
 import {
   AuthUser,
   ChangePasswordRequest,
@@ -10,7 +10,7 @@ import {
   LoginResponse,
   Profile,
   RegisterRequest,
-} from './auth.types';
+} from '../models/auth.types';
 
 /**
  * Cliente de los endpoints `/auth/*`. Solo hace las peticiones: no toca la sesión.

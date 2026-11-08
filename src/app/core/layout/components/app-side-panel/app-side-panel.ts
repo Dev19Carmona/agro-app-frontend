@@ -1,7 +1,7 @@
 import { Component, inject, output } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { NavigationService } from '../navigation/navigation';
-import { Icon } from '../../shared/ui/icon/icon';
+import { NavigationService } from '../../../navigation';
+import { Icon } from '../../../../shared/ui/icon/icon';
 
 let nextId = 0;
 

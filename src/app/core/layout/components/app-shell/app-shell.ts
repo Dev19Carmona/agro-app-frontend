@@ -2,11 +2,11 @@ import { Component, DestroyRef, DOCUMENT, ElementRef, inject, signal, viewChild 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, skip } from 'rxjs';
-import { Button } from '../../shared/ui/button/button';
-import { Drawer } from '../../shared/ui/drawer/drawer';
-import { Icon } from '../../shared/ui/icon/icon';
-import { AppHeader } from './app-header';
-import { AppSidePanel } from './app-side-panel';
+import { Button } from '../../../../shared/ui/button/button';
+import { Drawer } from '../../../../shared/ui/drawer/drawer';
+import { Icon } from '../../../../shared/ui/icon/icon';
+import { AppHeader } from '../app-header/app-header';
+import { AppSidePanel } from '../app-side-panel/app-side-panel';
 
 /** Punto de corte `lg` de Tailwind: desde aquí el panel es fijo; por debajo, es un drawer. */
 const LG_QUERY = '(min-width: 1024px)';

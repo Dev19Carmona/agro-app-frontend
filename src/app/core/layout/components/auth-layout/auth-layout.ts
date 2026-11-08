@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
-import { Icon } from '../../shared/ui/icon/icon';
-import { ThemeMenu } from '../theme/theme-menu';
+import { Icon } from '../../../../shared/ui/icon/icon';
+import { ThemeMenu } from '../../../theme';
 
 /**
  * Layout de las pantallas de acceso (login y registro): sin header ni panel, contenido centrado

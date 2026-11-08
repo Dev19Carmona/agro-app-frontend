@@ -4,8 +4,8 @@ import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { Profile, REFRESH_TOKEN_STORAGE_KEY } from '../../core/auth/auth.types';
-import { SessionService } from '../../core/auth/session';
+import { Profile, REFRESH_TOKEN_STORAGE_KEY } from '../../../../core/auth';
+import { SessionService } from '../../../../core/auth';
 import { Cuenta } from './cuenta';
 
 @Component({ template: 'página' })

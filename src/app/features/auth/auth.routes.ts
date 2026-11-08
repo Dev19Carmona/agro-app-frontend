@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { placeholderRoute } from '../../core/routing/placeholder-route';
+import { placeholderRoute } from '../../core/routing';
 
 /** Montadas bajo `/auth`, dentro de `AuthLayout` (sin header ni panel). */
 export const AUTH_ROUTES: Routes = [
@@ -10,7 +10,7 @@ export const AUTH_ROUTES: Routes = [
         'Formulario de correo y contraseña. Tras 5 intentos fallidos la cuenta se bloquea 15 minutos; una cuenta pendiente, rechazada o deshabilitada se informa solo con la contraseña correcta.',
       endpoints: ['POST /auth/login'],
     }),
-    loadComponent: () => import('./login/login').then((m) => m.Login),
+    loadComponent: () => import('./pages/login/login').then((m) => m.Login),
   },
   {
     ...placeholderRoute('registro', 'Crear cuenta', {
@@ -19,6 +19,6 @@ export const AUTH_ROUTES: Routes = [
         'Registro como productor o proveedor (nunca administrador), con aceptación del tratamiento de datos. Un proveedor queda pendiente hasta que un administrador apruebe su solicitud.',
       endpoints: ['POST /auth/register'],
     }),
-    loadComponent: () => import('./registro/registro').then((m) => m.Registro),
+    loadComponent: () => import('./pages/registro/registro').then((m) => m.Registro),
   },
 ];

@@ -1,5 +1,5 @@
 import { DOCUMENT, Service, computed, inject, signal } from '@angular/core';
-import { AuthUser, REFRESH_TOKEN_STORAGE_KEY, SessionRole, SessionStatus } from './auth.types';
+import { AuthUser, REFRESH_TOKEN_STORAGE_KEY, SessionRole, SessionStatus } from '../models/auth.types';
 
 /**
  * Estado de la sesión. El access token vive solo en memoria; el refresh token se guarda en

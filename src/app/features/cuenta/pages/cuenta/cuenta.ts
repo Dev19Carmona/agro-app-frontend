@@ -2,21 +2,21 @@ import { Component, inject, signal } from '@angular/core';
 import { FormField, FormRoot, form, required, validate } from '@angular/forms/signals';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-import { AuthApi } from '../../core/auth/auth-api';
-import { Profile, UserStatus } from '../../core/auth/auth.types';
-import { LogoutService } from '../../core/auth/logout';
-import { SessionService } from '../../core/auth/session';
-import { ApiError } from '../../core/http/api-error';
-import { SESSION_ROLE_LABELS } from '../../core/navigation/nav.config';
-import { Alert } from '../../shared/ui/alert/alert';
-import { Badge } from '../../shared/ui/badge/badge';
-import { BadgeTone } from '../../shared/ui/badge/badge.types';
-import { Button } from '../../shared/ui/button/button';
-import { Card } from '../../shared/ui/card/card';
-import { Input } from '../../shared/ui/input/input';
-import { PageHeader } from '../../shared/ui/page-header/page-header';
-import { changePasswordErrorMessage } from '../auth/auth-messages';
-import { passwordProblems } from '../auth/registro/register-validation';
+import { AuthApi } from '../../../../core/auth';
+import { Profile, UserStatus } from '../../../../core/auth';
+import { LogoutService } from '../../../../core/auth';
+import { SessionService } from '../../../../core/auth';
+import { ApiError } from '../../../../core/http';
+import { SESSION_ROLE_LABELS } from '../../../../core/navigation';
+import { Alert } from '../../../../shared/ui/alert/alert';
+import { Badge } from '../../../../shared/ui/badge/badge';
+import { BadgeTone } from '../../../../shared/ui/badge/badge.types';
+import { Button } from '../../../../shared/ui/button/button';
+import { Card } from '../../../../shared/ui/card/card';
+import { Input } from '../../../../shared/ui/input/input';
+import { PageHeader } from '../../../../shared/ui/page-header/page-header';
+import { changePasswordErrorMessage } from '../../../../core/auth';
+import { passwordProblems } from '../../../../core/auth';
 
 const STATUS: Record<UserStatus, { label: string; tone: BadgeTone }> = {
   ACTIVE: { label: 'Activa', tone: 'success' },

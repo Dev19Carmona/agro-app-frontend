@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { ThemeService } from './theme';
-import { DARK_CLASS, THEME_STORAGE_KEY } from './theme.types';
+import { DARK_CLASS, THEME_STORAGE_KEY } from '../models/theme.types';
 
 type Listener = (event: MediaQueryListEvent) => void;
 

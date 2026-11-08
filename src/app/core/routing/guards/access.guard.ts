@@ -1,9 +1,9 @@
 import { inject } from '@angular/core';
 import { CanActivateChildFn, Router } from '@angular/router';
-import { RouteInfo } from '../navigation/navigation.types';
-import { SessionRole } from './auth.types';
-import { DEFAULT_RETURN_URL } from './safe-return-url';
-import { SessionService } from './session';
+import { RouteInfo } from '../../navigation';
+import { SessionRole } from '../../auth';
+import { DEFAULT_RETURN_URL } from '../../auth';
+import { SessionService } from '../../auth';
 
 const ALL_ROLES: readonly SessionRole[] = ['VISITANTE', 'PRODUCTOR', 'PROVEEDOR', 'ADMIN'];
 

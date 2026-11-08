@@ -1,9 +1,9 @@
 import { Component, computed, inject } from '@angular/core';
-import { IconName } from '../../shared/ui/icon/icon.types';
-import { Menu } from '../../shared/ui/menu/menu';
-import { MenuItem } from '../../shared/ui/menu/menu.types';
-import { ThemeService } from './theme';
-import { ThemeMode } from './theme.types';
+import { IconName } from '../../../../shared/ui/icon/icon.types';
+import { Menu } from '../../../../shared/ui/menu/menu';
+import { MenuItem } from '../../../../shared/ui/menu/menu.types';
+import { ThemeService } from '../../services/theme';
+import { ThemeMode } from '../../models/theme.types';
 
 const THEME_ITEMS: MenuItem[] = [
   { id: 'light', label: 'Claro', icon: 'sun' },

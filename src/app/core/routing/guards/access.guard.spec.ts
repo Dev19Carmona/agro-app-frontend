@@ -2,10 +2,10 @@ import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router, Routes, provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { RouteInfo } from '../navigation/navigation.types';
+import { RouteInfo } from '../../navigation';
 import { accessGuard } from './access.guard';
-import { AppRole, SessionRole } from './auth.types';
-import { SessionService } from './session';
+import { AppRole, SessionRole } from '../../auth';
+import { SessionService } from '../../auth';
 
 @Component({ template: 'pantalla' })
 class Screen {}

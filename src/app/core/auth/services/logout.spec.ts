@@ -2,7 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
-import { REFRESH_TOKEN_STORAGE_KEY } from './auth.types';
+import { REFRESH_TOKEN_STORAGE_KEY } from '../models/auth.types';
 import { LogoutService } from './logout';
 import { SessionService } from './session';
 

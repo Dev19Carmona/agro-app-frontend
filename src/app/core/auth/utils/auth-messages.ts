@@ -1,5 +1,5 @@
-import { ApiError } from '../../core/http/api-error';
-import { AlertVariant } from '../../shared/ui/alert/alert.types';
+import { ApiError } from '../../http';
+import { AlertVariant } from '../../../shared/ui/alert/alert.types';
 
 export const NETWORK_MESSAGE = 'No se pudo conectar con el servidor';
 export const TOO_MANY_MESSAGE = 'Demasiados intentos, espera un minuto';

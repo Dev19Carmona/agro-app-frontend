@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ApiError } from './api-error';
+import { ApiError } from '../models/api-error';
 
 export const NETWORK_ERROR_MESSAGE = 'No se pudo conectar con el servidor';
 /** Estados con los que un proxy indica que el backend no está disponible. */

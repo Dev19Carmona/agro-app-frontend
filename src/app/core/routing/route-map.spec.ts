@@ -1,9 +1,9 @@
 import { Route, Routes } from '@angular/router';
 import { routes } from '../../app.routes';
-import { accessGuard } from '../auth/access.guard';
-import { SessionRole } from '../auth/auth.types';
-import { NAV_ITEMS } from '../navigation/nav.config';
-import { RouteInfo } from '../navigation/navigation.types';
+import { accessGuard } from './guards/access.guard';
+import { SessionRole } from '../auth';
+import { NAV_ITEMS } from '../navigation';
+import { RouteInfo } from '../navigation';
 
 interface Leaf {
   path: string;

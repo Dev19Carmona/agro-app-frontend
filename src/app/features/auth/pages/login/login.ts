@@ -3,15 +3,15 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { FormField, FormRoot, form, required } from '@angular/forms/signals';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-import { AuthApi } from '../../../core/auth/auth-api';
-import { safeReturnUrl } from '../../../core/auth/safe-return-url';
-import { SessionService } from '../../../core/auth/session';
-import { ApiError } from '../../../core/http/api-error';
-import { Alert } from '../../../shared/ui/alert/alert';
-import { Button } from '../../../shared/ui/button/button';
-import { Card } from '../../../shared/ui/card/card';
-import { Input } from '../../../shared/ui/input/input';
-import { loginErrorMessage, loginNotice } from '../auth-messages';
+import { AuthApi } from '../../../../core/auth';
+import { safeReturnUrl } from '../../../../core/auth';
+import { SessionService } from '../../../../core/auth';
+import { ApiError } from '../../../../core/http';
+import { Alert } from '../../../../shared/ui/alert/alert';
+import { Button } from '../../../../shared/ui/button/button';
+import { Card } from '../../../../shared/ui/card/card';
+import { Input } from '../../../../shared/ui/input/input';
+import { loginErrorMessage, loginNotice } from '../../../../core/auth';
 
 /**
  * `/auth/login`. Pide correo y contraseña (solo exige que no estén vacíos: la política real la

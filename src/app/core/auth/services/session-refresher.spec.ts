@@ -1,7 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { AuthUser, LoginResponse, REFRESH_TOKEN_STORAGE_KEY } from './auth.types';
+import { AuthUser, LoginResponse, REFRESH_TOKEN_STORAGE_KEY } from '../models/auth.types';
 import { SessionRefresher } from './session-refresher';
 import { SessionService } from './session';
 

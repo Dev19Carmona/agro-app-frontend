@@ -1,7 +1,7 @@
 import { Service, computed, inject } from '@angular/core';
-import { SessionService } from '../auth/session';
-import { NAV_GROUP_ORDER, NAV_ITEMS } from './nav.config';
-import { NavGroup } from './navigation.types';
+import { SessionService } from '../../auth';
+import { NAV_GROUP_ORDER, NAV_ITEMS } from '../config/nav.config';
+import { NavGroup } from '../models/navigation.types';
 
 /**
  * Ítems del panel de navegación que ve el rol de la sesión actual, agrupados y en el orden de

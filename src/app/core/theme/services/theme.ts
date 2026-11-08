@@ -1,5 +1,5 @@
 import { DestroyRef, DOCUMENT, Service, computed, effect, inject, signal } from '@angular/core';
-import { DARK_CLASS, EffectiveTheme, THEME_STORAGE_KEY, ThemeMode } from './theme.types';
+import { DARK_CLASS, EffectiveTheme, THEME_STORAGE_KEY, ThemeMode } from '../models/theme.types';
 
 const MODES: readonly ThemeMode[] = ['light', 'dark', 'system'];
 

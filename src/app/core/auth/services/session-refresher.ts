@@ -1,6 +1,6 @@
 import { DOCUMENT, Service, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { ApiError } from '../http/api-error';
+import { ApiError } from '../../http';
 import { AuthApi } from './auth-api';
 import { SessionService } from './session';
 

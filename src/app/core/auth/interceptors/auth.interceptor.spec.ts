@@ -2,9 +2,9 @@ import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
-import { AuthUser, LoginResponse, REFRESH_TOKEN_STORAGE_KEY } from './auth.types';
+import { AuthUser, LoginResponse, REFRESH_TOKEN_STORAGE_KEY } from '../models/auth.types';
 import { authInterceptor } from './auth.interceptor';
-import { SessionService } from './session';
+import { SessionService } from '../services/session';
 
 const USER: AuthUser = {
   id: '1',

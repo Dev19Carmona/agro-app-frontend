@@ -1,13 +1,13 @@
 import { Component, inject, input, output } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { Button } from '../../shared/ui/button/button';
-import { Icon } from '../../shared/ui/icon/icon';
-import { Menu } from '../../shared/ui/menu/menu';
-import { MenuItem } from '../../shared/ui/menu/menu.types';
-import { LogoutService } from '../auth/logout';
-import { SessionService } from '../auth/session';
+import { Button } from '../../../../shared/ui/button/button';
+import { Icon } from '../../../../shared/ui/icon/icon';
+import { Menu } from '../../../../shared/ui/menu/menu';
+import { MenuItem } from '../../../../shared/ui/menu/menu.types';
+import { LogoutService } from '../../../auth';
+import { SessionService } from '../../../auth';
 
-import { ThemeMenu } from '../theme/theme-menu';
+import { ThemeMenu } from '../../../theme';
 
 const USER_ITEMS: MenuItem[] = [
   { id: 'account', label: 'Mi cuenta', icon: 'user' },

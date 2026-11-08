@@ -1,6 +1,6 @@
 import { Route } from '@angular/router';
-import { SessionRole } from '../auth/auth.types';
-import { RouteInfo } from '../navigation/navigation.types';
+import { SessionRole } from '../../auth';
+import { RouteInfo } from '../../navigation';
 
 /** Todos los roles de la sesión: la ruta es pública o la ve cualquiera. */
 export const ALL_ROLES: SessionRole[] = ['VISITANTE', 'PRODUCTOR', 'PROVEEDOR', 'ADMIN'];
@@ -14,6 +14,6 @@ export function placeholderRoute(path: string, title: string, info: RouteInfo): 
     path,
     title,
     data: info,
-    loadComponent: () => import('./route-placeholder').then((m) => m.RoutePlaceholder),
+    loadComponent: () => import('../components/route-placeholder/route-placeholder').then((m) => m.RoutePlaceholder),
   };
 }

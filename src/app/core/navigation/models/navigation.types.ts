@@ -1,5 +1,5 @@
-import type { IconName } from '../../shared/ui/icon/icon.types';
-import type { SessionRole } from '../auth/auth.types';
+import type { IconName } from '../../../shared/ui/icon/icon.types';
+import type { SessionRole } from '../../auth';
 
 export type NavGroupName = 'Explorar' | 'Compras' | 'Mi tienda' | 'Administración' | 'Cuenta';
 

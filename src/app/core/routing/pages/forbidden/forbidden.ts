@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { Button } from '../../shared/ui/button/button';
-import { EmptyState } from '../../shared/ui/empty-state/empty-state';
+import { Button } from '../../../../shared/ui/button/button';
+import { EmptyState } from '../../../../shared/ui/empty-state/empty-state';
 
 /** `/acceso-denegado`: hay sesión, pero el rol no permite ver la pantalla pedida. */
 @Component({

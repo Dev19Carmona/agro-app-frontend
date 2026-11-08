@@ -2,17 +2,17 @@ import { Component, inject, signal } from '@angular/core';
 import { FormField, FormRoot, email, form, required, validate } from '@angular/forms/signals';
 import { Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-import { AuthApi } from '../../../core/auth/auth-api';
-import { ApiError } from '../../../core/http/api-error';
-import { Alert } from '../../../shared/ui/alert/alert';
-import { Button } from '../../../shared/ui/button/button';
-import { Card } from '../../../shared/ui/card/card';
-import { Checkbox } from '../../../shared/ui/checkbox/checkbox';
-import { Input } from '../../../shared/ui/input/input';
-import { Select } from '../../../shared/ui/select/select';
-import { SelectOption } from '../../../shared/ui/select/select.types';
-import { registerErrorMessage } from '../auth-messages';
-import { isValidDocument, isValidName, passwordProblems } from './register-validation';
+import { AuthApi } from '../../../../core/auth';
+import { ApiError } from '../../../../core/http';
+import { Alert } from '../../../../shared/ui/alert/alert';
+import { Button } from '../../../../shared/ui/button/button';
+import { Card } from '../../../../shared/ui/card/card';
+import { Checkbox } from '../../../../shared/ui/checkbox/checkbox';
+import { Input } from '../../../../shared/ui/input/input';
+import { Select } from '../../../../shared/ui/select/select';
+import { SelectOption } from '../../../../shared/ui/select/select.types';
+import { registerErrorMessage } from '../../../../core/auth';
+import { isValidDocument, isValidName, passwordProblems } from '../../../../core/auth';
 
 const ROLE_OPTIONS: SelectOption[] = [
   { value: 'PRODUCTOR', label: 'Productor' },

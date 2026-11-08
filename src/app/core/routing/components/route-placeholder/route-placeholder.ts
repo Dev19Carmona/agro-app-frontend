@@ -2,11 +2,11 @@ import { Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs';
-import { Badge } from '../../shared/ui/badge/badge';
-import { Card } from '../../shared/ui/card/card';
-import { PageHeader } from '../../shared/ui/page-header/page-header';
-import { SESSION_ROLE_LABELS } from '../navigation/nav.config';
-import { RouteInfo } from '../navigation/navigation.types';
+import { Badge } from '../../../../shared/ui/badge/badge';
+import { Card } from '../../../../shared/ui/card/card';
+import { PageHeader } from '../../../../shared/ui/page-header/page-header';
+import { SESSION_ROLE_LABELS } from '../../../navigation';
+import { RouteInfo } from '../../../navigation';
 
 /**
  * Pantalla provisional de una ruta: muestra su título, para qué rol es, qué hará y qué endpoints

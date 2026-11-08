@@ -1,11 +1,11 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { ApiError } from '../http/api-error';
-import { toApiError } from '../http/to-api-error';
+import { ApiError } from '../../http';
+import { toApiError } from '../../http';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthApi } from './auth-api';
-import { AuthUser, LoginResponse } from './auth.types';
+import { AuthUser, LoginResponse } from '../models/auth.types';
 
 const USER: AuthUser = {
   id: '1',

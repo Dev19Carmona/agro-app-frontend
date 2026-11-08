@@ -4,8 +4,8 @@ import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { LoginResponse } from '../../../core/auth/auth.types';
-import { SessionService } from '../../../core/auth/session';
+import { LoginResponse } from '../../../../core/auth';
+import { SessionService } from '../../../../core/auth';
 import { Login } from './login';
 
 @Component({ template: 'página' })
