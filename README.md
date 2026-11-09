@@ -1,59 +1,87 @@
-# AgroAppFrontend
+# Mini-Croper · Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.6.
+Frontend del marketplace agropecuario **Mini-Croper**, construido con Angular 22 (standalone, signals y Signal Forms), Tailwind CSS v4 y Angular Material encapsulado en componentes propios.
 
-## Development server
+Su backend es `agro-app-workspace` (NestJS, API en `:3000`); las reglas de negocio están en `docs/reglas-de-negocio.md` de ese repositorio.
 
-To start a local development server, run:
+## Funcionalidades
 
-```bash
-ng serve
-```
+| Módulo                | Rutas                | Descripción                                                                      |
+| --------------------- | -------------------- | -------------------------------------------------------------------------------- |
+| Auth y cuenta         | `/auth/*`, `/cuenta` | Login, registro (el proveedor queda en solicitud pendiente), sesión y cuenta     |
+| Catálogo público      | `/catalogo/*`        | Productos, detalle, ofertas, tiendas y detalle de tienda                         |
+| Compra del productor  | `/carrito`, `/pedidos` | Carrito, checkout, pedidos con sondeo y cronómetro de pago                     |
+| Pagos                 | `/pedidos/:id/pago`, `/pagos` | Simulador de pasarela, historial y detalle de pagos                     |
+| Proveedor             | `/proveedor/*`       | Tienda, productos, presentaciones, stock y pedidos recibidos                     |
+| Administración        | `/admin/*`           | Usuarios, categorías, tiendas, pedidos y pagos                                   |
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Cuatro roles: `VISITANTE`, `PRODUCTOR`, `PROVEEDOR` y `ADMIN`. Un `accessGuard` único protege las rutas según `RouteInfo.roles` (es una ayuda de UX; el backend es la autoridad).
 
-## Code scaffolding
+## Requisitos
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- Node.js y npm 11 (`packageManager: npm@11.19.0`)
+- Backend `agro-app-workspace` corriendo en `http://localhost:3000`
 
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
+## Puesta en marcha
 
 ```bash
-ng build
+npm install
+npm start
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Abre `http://localhost:4200`. El servidor de desarrollo reenvía `/api` → `http://localhost:3000` quitando el prefijo (`proxy.conf.json`); si lo cambias, reinicia el servidor. Con el backend apagado el proxy responde `502` y la app lo trata como "sin conexión".
 
-## Running unit tests
+## Scripts
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+| Comando         | Descripción                                          |
+| --------------- | ---------------------------------------------------- |
+| `npm start`     | Servidor de desarrollo (`ng serve`)                  |
+| `npm run build` | Build de producción en `dist/`                       |
+| `npm run watch` | Build de desarrollo en modo watch                    |
+| `npm test`      | Pruebas unitarias con Vitest (jsdom)                 |
 
-```bash
-ng test
+Un solo archivo de pruebas: `ng test --include src/app/app.spec.ts`.
+
+## Estructura
+
+```text
+src/app/
+├── core/          # infraestructura: http, auth, cart, orders, payments, catalog,
+│                  # theme, navigation, routing y layout
+├── features/      # catalogo, auth, cuenta, pedidos, pagos, proveedor, admin
+└── shared/ui/     # componentes app-* (únicos que conocen Material/CDK)
 ```
 
-## Running end-to-end tests
+Convenciones principales:
 
-For end-to-end (e2e) testing, run:
+- Cada módulo tiene `index.ts` como API pública; desde fuera solo se importa por ahí.
+- Una feature usa `core` y `shared/ui`, pero nunca otra feature; `core` nunca importa de `features`.
+- Todas las rutas son lazy, están en español y llevan `title` y `data: RouteInfo`.
+- **Prohibido** importar `@angular/material/*` o `@angular/cdk/*` fuera de `shared/ui`. Las features usan solo `app-*`.
+- Los formularios usan Signal Forms (`form(model, schema, { submission })`).
 
-```bash
-ng e2e
-```
+El detalle completo está en [`CLAUDE.md`](./CLAUDE.md) y las especificaciones por módulo en [`specs/`](./specs).
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## Sesión y seguridad
 
-## Additional Resources
+- El access token vive solo en memoria; el refresh token, en `localStorage` (`agro:refresh-token`).
+- Al arrancar se restaura la sesión con `POST /auth/refresh`.
+- `authInterceptor` añade `Authorization: Bearer` solo a `/api/*` y, ante un `401`, hace un único refresh compartido entre pestañas y reintenta una vez.
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Estilos y tema
+
+- Tipografía auto-hospedada: Source Serif 4 (títulos), Figtree (cuerpo) y Source Code Pro (código).
+- Colores como variables CSS `--c-*` (claro y oscuro con la clase `.app-dark`), expuestas a Tailwind. Usa los tokens (`bg-surface`, `text-fg`, `bg-brand`…), no colores fijos.
+- Tema claro, oscuro o del sistema, guardado en `localStorage` (`agro:theme`).
+
+## Componentes de UI
+
+`app-table`, `app-icon`, `app-button`, `app-badge`, `app-card`, `app-page-header`, `app-empty-state`, `app-menu`, `app-drawer`, `app-input`, `app-select`, `app-checkbox`, `app-alert`, `app-pagination`, `app-dialog` y `app-resource-state`. Cada uno tiene una demo en `/ui/<nombre>`.
+
+## Accesibilidad y diseño responsive
+
+Debe pasar AXE y cumplir WCAG AA. El diseño se comprueba a 360, 768 y 1280 px sin scroll horizontal de página.
+
+## Formato
+
+Prettier (`printWidth: 100`, comillas simples). No hay script de lint.
