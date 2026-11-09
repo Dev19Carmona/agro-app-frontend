@@ -5,7 +5,7 @@ import { Card } from '../../../../shared/ui/card/card';
 import { Table } from '../../../../shared/ui/table/table';
 import { TableCell } from '../../../../shared/ui/table/table-cell';
 import { TableColumn } from '../../../../shared/ui/table/table.types';
-import { OrderItem, SubOrder } from '../../models/pedidos.types';
+import { OrderItem, SubOrder } from '../../../../core/orders';
 
 /**
  * Ítems de un pedido por tienda, tal como se compraron (snapshot): nombre, presentación, unidad,
@@ -23,7 +23,9 @@ import { OrderItem, SubOrder } from '../../models/pedidos.types';
         <section [attr.aria-labelledby]="'sub-' + i">
           <app-card class="space-y-3">
             <div class="flex flex-wrap items-baseline justify-between gap-2">
-              <h2 [id]="'sub-' + i" class="text-xl">{{ storeNames().get(sub.storeId) ?? 'Tienda' }}</h2>
+              <h2 [id]="'sub-' + i" class="text-xl">
+                {{ storeNames().get(sub.storeId) ?? 'Tienda' }}
+              </h2>
               <p class="text-sm text-fg-muted">
                 Subtotal de la tienda:
                 <span class="font-semibold text-fg">{{ cop(sub.subtotal) }}</span>

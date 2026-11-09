@@ -3,7 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { Order, OrderStatus } from '../../models/pedidos.types';
+import { Order, OrderStatus } from '../../../../core/orders';
 import { PedidoDetalle } from './pedido-detalle';
 
 const ID = '507f1f77bcf86cd799439011';
@@ -190,7 +190,9 @@ describe('PedidoDetalle', () => {
       await tick(2000);
       http
         .expectOne(orderUrl)
-        .flush(order('AWAITING_PAYMENT', { expiresAt: new Date(Date.now() + 900_000).toISOString() }));
+        .flush(
+          order('AWAITING_PAYMENT', { expiresAt: new Date(Date.now() + 900_000).toISOString() }),
+        );
       await harness.fixture.whenStable();
       harness.detectChanges();
       expect(text()).toContain('Esperando pago');

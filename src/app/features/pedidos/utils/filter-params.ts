@@ -1,5 +1,5 @@
 import { OrdersFilter } from '../models/pedidos.types';
-import { isOrderStatus } from './order-status';
+import { isOrderStatus } from '../../../core/orders';
 
 interface ParamReader {
   get(name: string): string | null;

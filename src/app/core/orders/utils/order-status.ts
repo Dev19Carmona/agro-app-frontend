@@ -1,5 +1,5 @@
 import type { BadgeTone } from '../../../shared/ui/badge/badge.types';
-import { OrderStatus, OrderSummary } from '../models/pedidos.types';
+import { OrderStatus, OrderSummary } from '../models/orders.types';
 
 export const ORDER_STATUSES: readonly OrderStatus[] = [
   'PENDING',

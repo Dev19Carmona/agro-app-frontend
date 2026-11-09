@@ -11,7 +11,8 @@ export const routes: Routes = [
   {
     // Login y registro: pantalla completa, sin header ni panel (`AuthLayout`).
     path: 'auth',
-    loadComponent: () => import('./core/layout/components/auth-layout/auth-layout').then((m) => m.AuthLayout),
+    loadComponent: () =>
+      import('./core/layout/components/auth-layout/auth-layout').then((m) => m.AuthLayout),
     canActivateChild: [accessGuard],
     loadChildren: () => import('./features/auth').then((m) => m.AUTH_ROUTES),
   },
@@ -19,23 +20,28 @@ export const routes: Routes = [
   {
     // Ruta layout: header, panel y contenido (`AppShell`).
     path: '',
-    loadComponent: () => import('./core/layout/components/app-shell/app-shell').then((m) => m.AppShell),
+    loadComponent: () =>
+      import('./core/layout/components/app-shell/app-shell').then((m) => m.AppShell),
     canActivateChild: [accessGuard],
     children: [
       {
         path: 'catalogo',
-        loadChildren: () =>
-          import('./features/catalogo').then((m) => m.CATALOGO_ROUTES),
+        loadChildren: () => import('./features/catalogo').then((m) => m.CATALOGO_ROUTES),
       },
       {
         path: 'cuenta',
         loadChildren: () => import('./features/cuenta').then((m) => m.CUENTA_ROUTES),
       },
       {
+        // La pantalla de pago es del dominio pagos; se monta antes que `pedidos` para que
+        // `/pedidos/:id/pago` no quede tapada por las rutas de la raíz.
+        path: 'pedidos/:id/pago',
+        loadChildren: () => import('./features/pagos').then((m) => m.PAGAR_PEDIDO_ROUTES),
+      },
+      {
         // Carrito, checkout y pedidos son rutas de primer nivel: `/carrito`, `/checkout`, `/pedidos…`.
         path: '',
-        loadChildren: () =>
-          import('./features/pedidos').then((m) => m.PEDIDOS_ROUTES),
+        loadChildren: () => import('./features/pedidos').then((m) => m.PEDIDOS_ROUTES),
       },
       {
         path: 'pagos',
@@ -43,8 +49,7 @@ export const routes: Routes = [
       },
       {
         path: 'proveedor',
-        loadChildren: () =>
-          import('./features/proveedor').then((m) => m.PROVEEDOR_ROUTES),
+        loadChildren: () => import('./features/proveedor').then((m) => m.PROVEEDOR_ROUTES),
       },
       {
         path: 'admin',
@@ -55,7 +60,8 @@ export const routes: Routes = [
       {
         path: 'acceso-denegado',
         title: 'Acceso denegado',
-        loadComponent: () => import('./core/routing/pages/forbidden/forbidden').then((m) => m.Forbidden),
+        loadComponent: () =>
+          import('./core/routing/pages/forbidden/forbidden').then((m) => m.Forbidden),
       },
 
       // Demos de componentes de UI (`shared/ui`).
@@ -129,7 +135,8 @@ export const routes: Routes = [
       {
         path: '**',
         title: 'Página no encontrada',
-        loadComponent: () => import('./core/routing/pages/not-found/not-found').then((m) => m.NotFound),
+        loadComponent: () =>
+          import('./core/routing/pages/not-found/not-found').then((m) => m.NotFound),
       },
     ],
   },

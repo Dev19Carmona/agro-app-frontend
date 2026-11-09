@@ -7,4 +7,6 @@
 export interface ApiError {
   status: number;
   message: string;
+  /** `code` del cuerpo de error del backend, p. ej. `'ORDER_NOT_PAYABLE'`; solo si viene. */
+  code?: string;
 }

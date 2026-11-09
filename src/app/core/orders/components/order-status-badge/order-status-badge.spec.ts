@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { OrderStatus } from '../../models/pedidos.types';
+import { OrderStatus } from '../../models/orders.types';
 import { OrderStatusBadge } from './order-status-badge';
 
 @Component({

@@ -1,7 +1,8 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { CheckoutApiError, Order } from '../models/pedidos.types';
+import { Order } from '../../../core/orders';
+import { CheckoutApiError } from '../models/pedidos.types';
 import { PedidosApi } from './pedidos-api';
 
 const ORDER: Order = {
@@ -63,24 +64,16 @@ describe('PedidosApi', () => {
     second.flush({ data: [], page: 1, limit: 10, total: 0, totalPages: 0 });
   });
 
-  it('getOrder pide el pedido por id y convierte los errores en ApiError', () => {
-    const { api, http } = setup();
-    let error: unknown;
-    api.getOrder('o1').subscribe({ error: (e: unknown) => (error = e) });
-    http
-      .expectOne('/api/orders/o1')
-      .flush({ message: 'Pedido no encontrado' }, { status: 404, statusText: 'Not Found' });
-    expect(error).toEqual({ status: 404, message: 'Pedido no encontrado' });
-  });
-
   it('un 502 del proxy se trata como sin conexión', () => {
     const { api, http } = setup();
     let error: unknown;
     api.listOrders({ page: 1 }).subscribe({ error: (e: unknown) => (error = e) });
-    http.expectOne((r) => r.url === '/api/orders').flush(null, {
-      status: 502,
-      statusText: 'Bad Gateway',
-    });
+    http
+      .expectOne((r) => r.url === '/api/orders')
+      .flush(null, {
+        status: 502,
+        statusText: 'Bad Gateway',
+      });
     expect(error).toEqual({ status: 0, message: 'No se pudo conectar con el servidor' });
   });
 });

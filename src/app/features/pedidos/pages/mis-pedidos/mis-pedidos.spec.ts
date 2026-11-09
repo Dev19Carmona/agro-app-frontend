@@ -5,7 +5,7 @@ import { Router, provideRouter } from '@angular/router';
 import { By } from '@angular/platform-browser';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { Select } from '../../../../shared/ui/select/select';
-import { OrderStatus, OrderSummary } from '../../models/pedidos.types';
+import { OrderStatus, OrderSummary } from '../../../../core/orders';
 import { MisPedidos } from './mis-pedidos';
 
 function order(id: string, status: OrderStatus, total = 25000): OrderSummary {
@@ -52,7 +52,11 @@ describe('MisPedidos', () => {
   it('lista los pedidos con fecha, total con formatCop y estado', async () => {
     const { el, settle, list } = await setup();
     list().flush(
-      pageOf([order('o1', 'CONFIRMED', 230000), order('o2', 'AWAITING_PAYMENT'), order('o3', 'CANCELLED')]),
+      pageOf([
+        order('o1', 'CONFIRMED', 230000),
+        order('o2', 'AWAITING_PAYMENT'),
+        order('o3', 'CANCELLED'),
+      ]),
     );
     await settle();
     const rows = [...el.querySelectorAll('tbody tr')].map(
@@ -138,9 +142,7 @@ describe('MisPedidos', () => {
     list().error(new ProgressEvent('error'));
     await settle();
     expect(el.textContent).toContain('No se pudo conectar con el servidor');
-    [...el.querySelectorAll('button')]
-      .find((b) => b.textContent?.includes('Reintentar'))
-      ?.click();
+    [...el.querySelectorAll('button')].find((b) => b.textContent?.includes('Reintentar'))?.click();
     const again = await vi.waitFor(() => http.expectOne((r) => r.url === '/api/orders'));
     again.flush(pageOf([order('o1', 'PENDING')]));
     await settle();

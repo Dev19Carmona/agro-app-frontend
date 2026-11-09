@@ -3,6 +3,13 @@ import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { formatCop } from '../../../../core/catalog';
 import { resourceApiError } from '../../../../core/http';
+import {
+  ORDER_STATUSES,
+  OrderStatusBadge,
+  OrderSummary,
+  isOrderStatus,
+  orderStatusLabel,
+} from '../../../../core/orders';
 import { Button } from '../../../../shared/ui/button/button';
 import { PageHeader } from '../../../../shared/ui/page-header/page-header';
 import { Pagination } from '../../../../shared/ui/pagination/pagination';
@@ -12,12 +19,9 @@ import { SelectOption } from '../../../../shared/ui/select/select.types';
 import { Table } from '../../../../shared/ui/table/table';
 import { TableCell } from '../../../../shared/ui/table/table-cell';
 import { TableColumn } from '../../../../shared/ui/table/table.types';
-import { OrderStatusBadge } from '../../components/order-status-badge/order-status-badge';
-import { OrderSummary } from '../../models/pedidos.types';
 import { PedidosApi } from '../../services/pedidos-api';
 import { ordersFilterQuery, parseOrdersFilter } from '../../utils/filter-params';
 import { formatDateTime } from '../../utils/format-date';
-import { ORDER_STATUSES, isOrderStatus, orderStatusLabel } from '../../utils/order-status';
 
 const STATUS_OPTIONS: readonly SelectOption[] = [
   { value: '', label: 'Todos los estados' },
@@ -96,9 +100,7 @@ const STATUS_OPTIONS: readonly SelectOption[] = [
             >Ir a la primera página</a
           >
         } @else if (filter().status) {
-          <a emptyActions app-button variant="secondary" routerLink="/pedidos"
-            >Quitar el filtro</a
-          >
+          <a emptyActions app-button variant="secondary" routerLink="/pedidos">Quitar el filtro</a>
         } @else {
           <a emptyActions app-button routerLink="/catalogo">Ver el catálogo</a>
         }
@@ -188,6 +190,9 @@ export class MisPedidos {
   }
 
   private navigate(filter: ReturnType<typeof parseOrdersFilter>): void {
-    void this.router.navigate([], { relativeTo: this.route, queryParams: ordersFilterQuery(filter) });
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: ordersFilterQuery(filter),
+    });
   }
 }
