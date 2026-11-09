@@ -1,8 +1,9 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { SessionService } from '../../../../core/auth';
-import { CatalogApi } from '../../../../core/catalog';
+import { CartService, MAX_CART_LINES, MAX_CART_QUANTITY } from '../../../../core/cart';
+import { CatalogApi, PublicVariant } from '../../../../core/catalog';
 import { resourceApiError } from '../../../../core/http';
 import { Alert } from '../../../../shared/ui/alert/alert';
 import { Badge } from '../../../../shared/ui/badge/badge';
@@ -20,7 +21,9 @@ import { isObjectId } from '../../utils/filter-params';
  * si falla, solo se muestra el enlace "Ver tienda".
  *
  * Un producto a cotizar muestra "Precio a cotizar" y no ofrece compra. Para los demás, el visitante
- * ve "Inicia sesión para comprar". El botón de compra llega con la SPEC 07.
+ * ve "Inicia sesión para comprar" y el `PRODUCTOR` puede agregar presentaciones con stock al
+ * carrito (la cantidad se suma a la que ya hay, con tope 1000). El resultado se anuncia con un
+ * `app-alert`; pedir más que la disponibilidad solo avisa, porque el backend valida el stock después.
  */
 @Component({
   imports: [
@@ -105,11 +108,28 @@ import { isObjectId } from '../../utils/filter-params';
               <section aria-labelledby="presentaciones-titulo" class="space-y-3">
                 <h2 id="presentaciones-titulo" class="text-2xl">Presentaciones</h2>
                 @if (p.variantes.length > 0) {
-                  <app-variants-table [variants]="p.variantes" [requiresQuote]="p.requiresQuote" />
+                  <app-variants-table
+                    [variants]="p.variantes"
+                    [requiresQuote]="p.requiresQuote"
+                    [canBuy]="isBuyer() && !p.requiresQuote"
+                    [busyVariantId]="busyVariantId()"
+                    (addToCart)="addToCart(p.variantes, $event)"
+                  />
                 } @else {
                   <p class="text-fg-muted">
                     Este producto aún no tiene presentaciones disponibles.
                   </p>
+                }
+
+                @if (feedback(); as note) {
+                  <app-alert [variant]="note.variant">
+                    <span class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                      <span>{{ note.text }}</span>
+                      @if (note.variant !== 'danger') {
+                        <a routerLink="/carrito">Ver carrito</a>
+                      }
+                    </span>
+                  </app-alert>
                 }
 
                 @if (p.requiresQuote) {
@@ -143,6 +163,7 @@ export class ProductoDetalle {
   private readonly api = inject(CatalogApi);
   private readonly route = inject(ActivatedRoute);
   protected readonly session = inject(SessionService);
+  private readonly cart = inject(CartService);
 
   private readonly paramMap = toSignal(this.route.paramMap, {
     initialValue: this.route.snapshot.paramMap,
@@ -170,7 +191,49 @@ export class ProductoDetalle {
     this.product.hasValue() ? Object.entries(this.product.value().fichaTecnica) : [],
   );
 
+  protected readonly isBuyer = computed(() => this.session.role() === 'PRODUCTOR');
+  protected readonly busyVariantId = signal<string | null>(null);
+  protected readonly feedback = signal<{
+    variant: 'success' | 'info' | 'danger';
+    text: string;
+  } | null>(null);
+
   protected retry(): void {
     this.product.reload();
+  }
+
+  /** Suma la cantidad al carrito y anuncia el resultado. */
+  protected async addToCart(
+    variants: PublicVariant[],
+    event: { variantId: string; cantidad: number },
+  ): Promise<void> {
+    const variant = variants.find((v) => v.id === event.variantId);
+    if (!variant || this.busyVariantId()) {
+      return;
+    }
+    const inCart = this.cart.items().some((item) => item.variantId === variant.id);
+    if (!inCart && this.cart.count() >= MAX_CART_LINES) {
+      this.feedback.set({
+        variant: 'danger',
+        text: `El carrito ya tiene ${MAX_CART_LINES} líneas. Quita alguna para agregar otra presentación.`,
+      });
+      return;
+    }
+    this.busyVariantId.set(variant.id);
+    this.feedback.set(null);
+    const result = await this.cart.add(variant.id, event.cantidad);
+    this.busyVariantId.set(null);
+    if (!result.ok) {
+      this.feedback.set({ variant: 'danger', text: result.error.message });
+      return;
+    }
+    const notes = [`Agregado al carrito: ${variant.presentacion} (${result.cantidad} en total).`];
+    if (result.recortada) {
+      notes.push(`La cantidad se limitó a ${MAX_CART_QUANTITY}, el máximo por línea.`);
+    }
+    if (result.cantidad > variant.disponible) {
+      notes.push('Supera la disponibilidad actual; el pedido puede ser rechazado.');
+    }
+    this.feedback.set({ variant: notes.length > 1 ? 'info' : 'success', text: notes.join(' ') });
   }
 }

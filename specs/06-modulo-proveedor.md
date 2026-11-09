@@ -1,6 +1,6 @@
 # SPEC 06 — Módulo Proveedor: tienda, productos, presentaciones, stock y pedidos recibidos
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** SPEC 03, SPEC 04, SPEC 05
 > **Date:** 2026-11-08
 > **Objective:** Reemplazar los seis placeholders de `/proveedor/*` por pantallas reales con las que un `PROVEEDOR` crea su tienda, administra productos, presentaciones y stock, y consulta los sub-pedidos pagados de su tienda, conectadas a los endpoints `/catalog/*` y `/orders/provider/*` del backend.

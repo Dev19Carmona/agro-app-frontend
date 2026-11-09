@@ -21,6 +21,8 @@ const BASE: PublicVariant = {
     [requiresQuote]="requiresQuote"
     [showProduct]="showProduct"
     [productNames]="names"
+    [canBuy]="canBuy"
+    (addToCart)="added.push($event)"
   />`,
 })
 class Host {
@@ -28,6 +30,36 @@ class Host {
   requiresQuote = false;
   showProduct = false;
   names = new Map<string, string>();
+  canBuy = false;
+  added: { variantId: string; cantidad: number }[] = [];
+}
+
+function setupBuyer(patch: Partial<Host> = {}) {
+  TestBed.configureTestingModule({ providers: [provideRouter([])] });
+  const fixture = TestBed.createComponent(Host);
+  Object.assign(fixture.componentInstance, { canBuy: true, ...patch });
+  fixture.detectChanges();
+  const root = fixture.nativeElement as HTMLElement;
+  return {
+    fixture,
+    root,
+    host: fixture.componentInstance,
+    input: () => root.querySelector<HTMLInputElement>('input[type="number"]'),
+    button: () =>
+      [...root.querySelectorAll('button')].find((b) =>
+        b.textContent?.includes('Agregar al carrito'),
+      ),
+  };
+}
+
+function type(
+  ctx: ReturnType<typeof setupBuyer>,
+  value: string,
+) {
+  const el = ctx.input() as HTMLInputElement;
+  el.value = value;
+  el.dispatchEvent(new Event('input'));
+  ctx.fixture.detectChanges();
 }
 
 function setup(patch: Partial<Host> = {}) {
@@ -119,6 +151,50 @@ describe('VariantsTable', () => {
       expect(links[1].getAttribute('href')).toBe('/catalogo/productos/p2');
       expect(root.textContent).toContain('Litro');
       expect(root.textContent).toContain('$ 25.000');
+    });
+  });
+
+  describe('con canBuy', () => {
+    it('sin canBuy no hay cantidad ni botón', () => {
+      const root = setup();
+      expect(root.querySelector('input')).toBeNull();
+      expect(root.textContent).not.toContain('Agregar al carrito');
+    });
+
+    it('muestra cantidad (1 por defecto) y botón en presentaciones con stock', () => {
+      const { input, button } = setupBuyer();
+      expect(input()?.value).toBe('1');
+      expect(button()).toBeDefined();
+    });
+
+    it('no ofrece compra en una presentación sin stock', () => {
+      const { input, button } = setupBuyer({ variants: [{ ...BASE, disponible: 0 }] });
+      expect(input()).toBeNull();
+      expect(button()).toBeUndefined();
+    });
+
+    it('emite addToCart con la presentación y la cantidad escrita', () => {
+      const ctx = setupBuyer();
+      type(ctx, '7');
+      ctx.button()?.click();
+      expect(ctx.host.added).toEqual([{ variantId: 'v1', cantidad: 7 }]);
+    });
+
+    it.each(['0', '-3', '2.5', '1001'])('con %s muestra el error y no emite', (bad) => {
+      const ctx = setupBuyer();
+      type(ctx, bad);
+      expect(ctx.root.textContent).toContain('Entero entre 1 y 1000');
+      expect((ctx.button() as HTMLButtonElement).disabled).toBe(true);
+      ctx.button()?.click();
+      expect(ctx.host.added).toEqual([]);
+    });
+
+    it('avisa cuando la cantidad supera la disponibilidad pero deja agregar', () => {
+      const ctx = setupBuyer();
+      type(ctx, '11');
+      expect(ctx.root.textContent).toContain('Supera la disponibilidad actual');
+      ctx.button()?.click();
+      expect(ctx.host.added).toEqual([{ variantId: 'v1', cantidad: 11 }]);
     });
   });
 });

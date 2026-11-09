@@ -1,6 +1,6 @@
 # SPEC 07 — Módulo Carrito, checkout y pedidos del productor
 
-> **Status:** Borrador
+> **Status:** Aprobado
 > **Depends on:** SPEC 03, SPEC 04, SPEC 05, SPEC 06
 > **Date:** 2026-11-08
 > **Objective:** Permitir que un `PRODUCTOR` agregue presentaciones al carrito desde el catálogo, revise su carrito, confirme el pedido y siga su estado (incluido el cronómetro de pago), reemplazando los placeholders de `/carrito`, `/checkout`, `/pedidos` y `/pedidos/:id` y conectándolos con `/orders/*` del backend.
