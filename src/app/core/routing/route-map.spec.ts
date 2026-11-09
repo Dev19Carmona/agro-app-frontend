@@ -140,12 +140,28 @@ describe('Mapa de rutas', () => {
     expect(orphans).toEqual(['/checkout']);
   });
 
-  it('lista las pantallas que aún usan el placeholder (SPEC 04 las irá sustituyendo)', () => {
+  it('las cinco pantallas del catálogo ya no usan el placeholder (SPEC 05)', () => {
+    const catalog = screens.filter(({ path }) => path.startsWith('/catalogo'));
+    expect(catalog.map(({ path }) => path).sort()).toEqual([
+      '/catalogo',
+      '/catalogo/ofertas',
+      '/catalogo/productos/:id',
+      '/catalogo/tiendas',
+      '/catalogo/tiendas/:id',
+    ]);
+    for (const { path, route } of catalog) {
+      expect(String(route.loadComponent), `${path}: sigue siendo placeholder`).not.toContain(
+        'route-placeholder',
+      );
+    }
+  });
+
+  it('lista las pantallas que aún usan el placeholder (las SPEC 06 a 09 las irán sustituyendo)', () => {
     const pending = screens
       .filter(({ route }) => String(route.loadComponent).includes('route-placeholder'))
       .map(({ path }) => path);
     console.info(`Pantallas con placeholder: ${pending.length} de ${screens.length}`);
-    // A medida que SPEC 04 las maqueta este número baja a 0.
+    // A medida que las SPEC 06 a 09 las maquetan este número baja a 0.
     expect(pending.length).toBeLessThanOrEqual(screens.length);
     expect(pending.every((path) => SPEC_ROUTES.includes(path))).toBe(true);
   });

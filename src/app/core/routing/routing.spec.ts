@@ -1,3 +1,5 @@
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { Title } from '@angular/platform-browser';
 import { Router, TitleStrategy, provideRouter } from '@angular/router';
@@ -6,11 +8,18 @@ import { routes } from '../../app.routes';
 import { AppRole, SessionRole } from '../auth';
 import { SessionService } from '../auth';
 import { PageTitleStrategy } from './services/page-title.strategy';
+import { ALL_ROLES, placeholderRoute } from './utils/placeholder-route';
 
 /** Navega a `url` con la sesión de `role` (`VISITANTE` = sin sesión). */
 async function go(url: string, role: SessionRole = 'VISITANTE') {
   TestBed.configureTestingModule({
-    providers: [provideRouter(routes), { provide: TitleStrategy, useClass: PageTitleStrategy }],
+    providers: [
+      provideRouter(routes),
+      provideHttpClient(),
+      // Las pantallas reales piden datos: con el backend de pruebas esas peticiones quedan pendientes.
+      provideHttpClientTesting(),
+      { provide: TitleStrategy, useClass: PageTitleStrategy },
+    ],
   });
   if (role !== 'VISITANTE') {
     TestBed.inject(SessionService).start(
@@ -41,8 +50,24 @@ describe('Árbol de rutas', () => {
     expect(h1).toBe('Catálogo');
   });
 
-  it('una ruta pública muestra "Todos" como rol y no tiene parámetros', async () => {
-    const { badges, el } = await go('/catalogo');
+  it('el placeholder de una ruta pública muestra "Todos" como rol y no tiene parámetros', async () => {
+    // Todas las rutas públicas de la app ya tienen pantalla real (SPEC 05): se prueba con una sintética.
+    TestBed.configureTestingModule({
+      providers: [
+        provideRouter([
+          placeholderRoute('demo', 'Demo', {
+            roles: ALL_ROLES,
+            description: 'Ruta pública de prueba.',
+            endpoints: ['GET /demo'],
+          }),
+        ]),
+      ],
+    });
+    const harness = await RouterTestingHarness.create();
+    await harness.navigateByUrl('/demo');
+    harness.detectChanges();
+    const el = harness.routeNativeElement as HTMLElement;
+    const badges = Array.from(el.querySelectorAll('app-badge')).map((b) => b.textContent?.trim());
     expect(badges).toEqual(['Todos']);
     expect(el.textContent).not.toContain('Parámetros de la ruta');
   });
