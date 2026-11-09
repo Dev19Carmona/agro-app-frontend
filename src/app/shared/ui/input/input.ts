@@ -31,8 +31,12 @@ import { InputType } from './input.types';
  * El error se muestra cuando el campo está tocado y tiene algún error con `message`. Sin Signal
  * Forms se puede usar con `[(value)]`, `[errors]` y `[touched]`.
  *
+ * Con `type="number"` el valor es un número (`null` si el campo está vacío o no es un número) y
+ * se pueden dar `min`, `max` y `step`; la rueda del ratón no cambia el valor. Con cualquier otro
+ * tipo el valor es un `string`.
+ *
  * Valores por defecto: `type='text'`, `hint=null`, `placeholder=''`, `autocomplete=null`,
- * `value=''`, `required=false`, `readonly=false`, `disabled=false`.
+ * `value=''`, `required=false`, `readonly=false`, `disabled=false`, `min`, `max` y `step` sin valor.
  */
 @Component({
   selector: 'app-input',
@@ -44,7 +48,11 @@ import { InputType } from './input.types';
         #field
         matInput
         [type]="inputType()"
-        [value]="value()"
+        [value]="value() ?? ''"
+        [attr.min]="min() ?? null"
+        [attr.max]="max() ?? null"
+        [attr.step]="step() ?? null"
+        [attr.inputmode]="type() === 'number' ? 'decimal' : null"
         [placeholder]="placeholder()"
         [attr.autocomplete]="autocomplete()"
         [attr.name]="name() || null"
@@ -53,6 +61,7 @@ import { InputType } from './input.types';
         [required]="required()"
         [errorStateMatcher]="matcher"
         (input)="onInput($event)"
+        (wheel)="onWheel($event)"
         (blur)="touch.emit()"
       />
       @if (type() === 'password') {
@@ -78,7 +87,7 @@ import { InputType } from './input.types';
   `,
   host: { class: 'block' },
 })
-export class Input implements FormValueControl<string> {
+export class Input implements FormValueControl<string | number | null> {
   readonly label = input.required<string>();
   readonly type = input<InputType>('text');
   readonly hint = input<string | null>(null);
@@ -87,13 +96,17 @@ export class Input implements FormValueControl<string> {
   readonly autocomplete = input<string | null>(null);
 
   // Contrato de control de Signal Forms: `[formField]` mantiene estas propiedades sincronizadas.
-  readonly value = model('');
+  readonly value = model<string | number | null>('');
   readonly errors = input<FieldErrors>([]);
   readonly touched = input(false);
   readonly disabled = input(false);
   readonly readonly = input(false);
   readonly required = input(false);
   readonly name = input('');
+  /** Solo con `type="number"`: límites y paso del valor. */
+  readonly min = input<string | number | undefined>(undefined);
+  readonly max = input<string | number | undefined>(undefined);
+  readonly step = input<number | undefined>(undefined);
   readonly touch = output<void>();
 
   protected readonly revealed = signal(false);
@@ -130,6 +143,19 @@ export class Input implements FormValueControl<string> {
   }
 
   protected onInput(event: Event): void {
-    this.value.set((event.target as HTMLInputElement).value);
+    const raw = (event.target as HTMLInputElement).value;
+    if (this.type() !== 'number') {
+      this.value.set(raw);
+      return;
+    }
+    const parsed = raw.trim() === '' ? Number.NaN : Number(raw);
+    this.value.set(Number.isFinite(parsed) ? parsed : null);
+  }
+
+  /** Evita que la rueda del ratón cambie un número mientras el campo tiene el foco. */
+  protected onWheel(event: Event): void {
+    if (this.type() === 'number' && event.target === document.activeElement) {
+      (event.target as HTMLInputElement).blur();
+    }
   }
 }

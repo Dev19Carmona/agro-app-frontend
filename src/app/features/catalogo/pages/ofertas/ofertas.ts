@@ -1,15 +1,15 @@
 import { Component, computed, inject } from '@angular/core';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { CatalogApi } from '../../../../core/catalog';
+import { resourceApiError } from '../../../../core/http';
 import { Observable, catchError, forkJoin, map, of } from 'rxjs';
 import { Button } from '../../../../shared/ui/button/button';
 import { PageHeader } from '../../../../shared/ui/page-header/page-header';
 import { Pagination } from '../../../../shared/ui/pagination/pagination';
-import { CatalogoState } from '../../components/catalogo-state/catalogo-state';
+import { ResourceState } from '../../../../shared/ui/resource-state/resource-state';
 import { VariantsTable } from '../../components/variants-table/variants-table';
-import { CatalogoApi } from '../../services/catalogo-api';
 import { parsePageParam, toQueryParams } from '../../utils/filter-params';
-import { resourceApiError } from '../../utils/resource-error';
 
 /**
  * `/catalogo/ofertas`: presentaciones con precio de oferta. El backend devuelve solo el
@@ -20,7 +20,7 @@ import { resourceApiError } from '../../utils/resource-error';
  * producto falla, esa fila se queda con la presentación, el precio y el enlace sin nombre.
  */
 @Component({
-  imports: [PageHeader, CatalogoState, VariantsTable, Pagination, Button, RouterLink],
+  imports: [PageHeader, ResourceState, VariantsTable, Pagination, Button, RouterLink],
   template: `
     <div class="space-y-6">
       <app-page-header title="Ofertas" description="Presentaciones con precio de oferta vigente." />
@@ -29,7 +29,7 @@ import { resourceApiError } from '../../utils/resource-error';
         <p class="text-sm text-fg-muted" aria-live="polite">{{ totalText() }}</p>
       }
 
-      <app-catalogo-state
+      <app-resource-state
         skeleton="detail"
         emptyIcon="tag"
         [loading]="offers.isLoading()"
@@ -51,7 +51,7 @@ import { resourceApiError } from '../../utils/resource-error';
           [queryParams]="emptyView().linkParams"
           >{{ emptyView().linkLabel }}</a
         >
-      </app-catalogo-state>
+      </app-resource-state>
 
       <app-pagination
         ariaLabel="Paginación de ofertas"
@@ -63,7 +63,7 @@ import { resourceApiError } from '../../utils/resource-error';
   `,
 })
 export class Ofertas {
-  private readonly api = inject(CatalogoApi);
+  private readonly api = inject(CatalogApi);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 

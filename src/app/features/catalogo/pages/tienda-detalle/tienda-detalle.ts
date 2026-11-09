@@ -1,15 +1,15 @@
 import { Component, computed, inject } from '@angular/core';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { CatalogApi } from '../../../../core/catalog';
+import { resourceApiError } from '../../../../core/http';
 import { Button } from '../../../../shared/ui/button/button';
 import { EmptyState } from '../../../../shared/ui/empty-state/empty-state';
 import { PageHeader } from '../../../../shared/ui/page-header/page-header';
 import { Pagination } from '../../../../shared/ui/pagination/pagination';
-import { CatalogoState } from '../../components/catalogo-state/catalogo-state';
+import { ResourceState } from '../../../../shared/ui/resource-state/resource-state';
 import { ProductCard } from '../../components/product-card/product-card';
-import { CatalogoApi } from '../../services/catalogo-api';
 import { isObjectId, parsePageParam, toQueryParams } from '../../utils/filter-params';
-import { resourceApiError } from '../../utils/resource-error';
 
 /**
  * `/catalogo/tiendas/:id`: nombre y municipio de la tienda y sus productos
@@ -17,7 +17,7 @@ import { resourceApiError } from '../../utils/resource-error';
  * a la vez; un id inexistente, inactivo o inválido muestra "Tienda no encontrada".
  */
 @Component({
-  imports: [PageHeader, CatalogoState, ProductCard, Pagination, EmptyState, Button, RouterLink],
+  imports: [PageHeader, ResourceState, ProductCard, Pagination, EmptyState, Button, RouterLink],
   template: `
     <div class="space-y-6">
       <app-page-header
@@ -45,7 +45,7 @@ import { resourceApiError } from '../../utils/resource-error';
             <p class="text-sm text-fg-muted" aria-live="polite">{{ totalText() }}</p>
           }
 
-          <app-catalogo-state
+          <app-resource-state
             [loading]="isLoading()"
             [error]="error()"
             [empty]="items().length === 0"
@@ -68,7 +68,7 @@ import { resourceApiError } from '../../utils/resource-error';
                 >Ir a la primera página</a
               >
             }
-          </app-catalogo-state>
+          </app-resource-state>
 
           <app-pagination
             ariaLabel="Paginación de productos de la tienda"
@@ -82,7 +82,7 @@ import { resourceApiError } from '../../utils/resource-error';
   `,
 })
 export class TiendaDetalle {
-  private readonly api = inject(CatalogoApi);
+  private readonly api = inject(CatalogApi);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 

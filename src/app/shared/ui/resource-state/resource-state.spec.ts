@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { ApiError } from '../../../../core/http';
-import { CatalogoState } from './catalogo-state';
+import { ResourceState } from './resource-state';
+import { ResourceStateError } from './resource-state.types';
 
 @Component({
-  imports: [CatalogoState],
+  imports: [ResourceState],
   template: `
-    <app-catalogo-state
+    <app-resource-state
       [loading]="loading"
       [error]="error"
       [empty]="empty"
@@ -15,12 +15,12 @@ import { CatalogoState } from './catalogo-state';
     >
       <p id="contenido">Contenido</p>
       <a emptyActions href="/catalogo">Volver</a>
-    </app-catalogo-state>
+    </app-resource-state>
   `,
 })
 class Host {
   loading = false;
-  error: ApiError | null = null;
+  error: ResourceStateError | null = null;
   empty = false;
   retries = 0;
 }
@@ -32,7 +32,7 @@ function setup(patch: Partial<Host> = {}) {
   return { fixture, root: fixture.nativeElement as HTMLElement };
 }
 
-describe('CatalogoState', () => {
+describe('ResourceState', () => {
   it('muestra el contenido cuando no hay carga, error ni vacío', () => {
     const { root } = setup();
     expect(root.querySelector('#contenido')).not.toBeNull();
@@ -49,7 +49,7 @@ describe('CatalogoState', () => {
 
   it('error: muestra el mensaje con role="alert" y el botón Reintentar', () => {
     const { fixture, root } = setup({
-      error: { status: 0, message: 'No se pudo conectar con el servidor' },
+      error: { message: 'No se pudo conectar con el servidor' },
     });
     expect(root.querySelector('[role="alert"]')?.textContent).toContain(
       'No se pudo conectar con el servidor',
@@ -69,18 +69,27 @@ describe('CatalogoState', () => {
     expect(root.querySelector('#contenido')).toBeNull();
   });
 
+  it('el esqueleto de tabla se muestra con skeleton="table"', () => {
+    const fixture = TestBed.createComponent(ResourceState);
+    fixture.componentRef.setInput('loading', true);
+    fixture.componentRef.setInput('skeleton', 'table');
+    fixture.detectChanges();
+    const root = fixture.nativeElement as HTMLElement;
+    expect(root.querySelectorAll('[aria-hidden="true"]').length).toBe(6);
+  });
+
   it('la carga tiene prioridad sobre el error y el vacío', () => {
     const { root } = setup({
       loading: true,
       empty: true,
-      error: { status: 500, message: 'Fallo' },
+      error: { message: 'Fallo' },
     });
     expect(root.querySelector('[aria-busy="true"]')).not.toBeNull();
     expect(root.querySelector('[role="alert"]')).toBeNull();
   });
 
   it('el error tiene prioridad sobre el vacío', () => {
-    const { root } = setup({ empty: true, error: { status: 500, message: 'Fallo' } });
+    const { root } = setup({ empty: true, error: { message: 'Fallo' } });
     expect(root.querySelector('[role="alert"]')).not.toBeNull();
     expect(root.textContent).not.toContain('Sin productos');
   });

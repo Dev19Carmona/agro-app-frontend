@@ -2,17 +2,17 @@ import { Component, computed, inject } from '@angular/core';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { SessionService } from '../../../../core/auth';
+import { CatalogApi } from '../../../../core/catalog';
+import { resourceApiError } from '../../../../core/http';
 import { Alert } from '../../../../shared/ui/alert/alert';
 import { Badge } from '../../../../shared/ui/badge/badge';
 import { Button } from '../../../../shared/ui/button/button';
 import { Card } from '../../../../shared/ui/card/card';
 import { EmptyState } from '../../../../shared/ui/empty-state/empty-state';
 import { PageHeader } from '../../../../shared/ui/page-header/page-header';
-import { CatalogoState } from '../../components/catalogo-state/catalogo-state';
+import { ResourceState } from '../../../../shared/ui/resource-state/resource-state';
 import { VariantsTable } from '../../components/variants-table/variants-table';
-import { CatalogoApi } from '../../services/catalogo-api';
 import { isObjectId } from '../../utils/filter-params';
-import { resourceApiError } from '../../utils/resource-error';
 
 /**
  * `/catalogo/productos/:id`: datos del producto, ficha técnica y presentaciones con precio
@@ -25,7 +25,7 @@ import { resourceApiError } from '../../utils/resource-error';
 @Component({
   imports: [
     PageHeader,
-    CatalogoState,
+    ResourceState,
     VariantsTable,
     Card,
     Badge,
@@ -51,7 +51,7 @@ import { resourceApiError } from '../../utils/resource-error';
           <a actions app-button routerLink="/catalogo">Ver el catálogo</a>
         </app-empty-state>
       } @else {
-        <app-catalogo-state
+        <app-resource-state
           skeleton="detail"
           [loading]="product.isLoading()"
           [error]="error()"
@@ -134,13 +134,13 @@ import { resourceApiError } from '../../utils/resource-error';
               </section>
             </div>
           }
-        </app-catalogo-state>
+        </app-resource-state>
       }
     </div>
   `,
 })
 export class ProductoDetalle {
-  private readonly api = inject(CatalogoApi);
+  private readonly api = inject(CatalogApi);
   private readonly route = inject(ActivatedRoute);
   protected readonly session = inject(SessionService);
 

@@ -1,4 +1,4 @@
-import { resourceApiError } from './resource-error';
+import { resourceApiError } from './resource-api-error';
 
 describe('resourceApiError', () => {
   it('sin error devuelve null', () => {

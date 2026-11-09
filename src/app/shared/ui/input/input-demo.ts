@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { FormField, form, required } from '@angular/forms/signals';
+import { FormField, form, min, required } from '@angular/forms/signals';
 import { Input } from './input';
 
 @Component({
@@ -18,6 +18,17 @@ import { Input } from './input';
           hint="Usa el botón para mostrarla u ocultarla"
         />
         <app-input label="Teléfono" type="tel" />
+        <app-input
+          label="Precio (COP)"
+          type="number"
+          hint="Número entero, sin separadores"
+          [min]="1"
+          [step]="1"
+          [(value)]="precio"
+        />
+        <p class="text-fg-muted">
+          Valor numérico: <code>{{ precio() === null ? 'null' : precio() }}</code>
+        </p>
       </section>
 
       <section aria-labelledby="input-states" class="space-y-4">
@@ -31,6 +42,14 @@ import { Input } from './input';
         />
       </section>
 
+      <section aria-labelledby="input-number-form" class="space-y-4">
+        <h2 id="input-number-form" class="text-xl">Número con Signal Forms</h2>
+        <p class="text-fg-muted">
+          Stock actual en el modelo: <code>{{ stockModel().stock }}</code>
+        </p>
+        <app-input label="Stock" type="number" [step]="1" [formField]="stockForm.stock" />
+      </section>
+
       <section aria-labelledby="input-signal" class="space-y-4">
         <h2 id="input-signal" class="text-xl">Con Signal Forms</h2>
         <p class="text-fg-muted">
@@ -42,8 +61,14 @@ import { Input } from './input';
   `,
 })
 export class InputDemo {
-  protected readonly name = signal('Ana Pérez');
+  protected readonly name = signal<string | number | null>('Ana Pérez');
+  protected readonly precio = signal<string | number | null>(null);
   protected readonly model = signal({ email: '' });
+  protected readonly stockModel = signal<{ stock: number | null }>({ stock: 10 });
+  protected readonly stockForm = form(this.stockModel, (path) => {
+    required(path.stock, { message: 'Escribe el stock' });
+    min(path.stock, 0, { message: 'El stock no puede ser negativo' });
+  });
   protected readonly f = form(this.model, (path) => {
     required(path.email, { message: 'Escribe tu correo' });
   });
