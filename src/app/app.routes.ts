@@ -110,6 +110,11 @@ export const routes: Routes = [
         loadComponent: () => import('./shared/ui/alert/alert-demo').then((m) => m.AlertDemo),
       },
       {
+        path: 'ui/pagination',
+        loadComponent: () =>
+          import('./shared/ui/pagination/pagination-demo').then((m) => m.PaginationDemo),
+      },
+      {
         path: 'ui/empty-state',
         loadComponent: () =>
           import('./shared/ui/empty-state/empty-state-demo').then((m) => m.EmptyStateDemo),
