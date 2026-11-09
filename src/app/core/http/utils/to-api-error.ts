@@ -27,6 +27,15 @@ function extractMessage(body: unknown): string | null {
   return null;
 }
 
+/** `code` (texto no vacío) del cuerpo de error del backend, si lo trae. */
+function extractCode(body: unknown): string | null {
+  if (typeof body !== 'object' || body === null || !('code' in body)) {
+    return null;
+  }
+  const { code } = body;
+  return typeof code === 'string' && code.trim() ? code : null;
+}
+
 /** Convierte cualquier error de `HttpClient` en un `ApiError`. `status` 0 = sin respuesta. */
 export function toApiError(error: unknown): ApiError {
   if (error instanceof HttpErrorResponse) {
@@ -34,7 +43,12 @@ export function toApiError(error: unknown): ApiError {
     if (error.status === 0 || GATEWAY_STATUSES.includes(error.status)) {
       return { status: 0, message: NETWORK_ERROR_MESSAGE };
     }
-    return { status: error.status, message: extractMessage(error.error) ?? FALLBACK_MESSAGE };
+    const code = extractCode(error.error);
+    return {
+      status: error.status,
+      message: extractMessage(error.error) ?? FALLBACK_MESSAGE,
+      ...(code ? { code } : {}),
+    };
   }
   return { status: 0, message: NETWORK_ERROR_MESSAGE };
 }

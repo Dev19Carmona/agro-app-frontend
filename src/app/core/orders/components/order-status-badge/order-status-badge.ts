@@ -1,6 +1,6 @@
 import { Component, computed, input } from '@angular/core';
 import { Badge } from '../../../../shared/ui/badge/badge';
-import { OrderStatus } from '../../models/pedidos.types';
+import { OrderStatus } from '../../models/orders.types';
 import { orderStatusLabel, orderStatusTone } from '../../utils/order-status';
 
 /** Estado de un pedido como badge: el significado va en el texto y el color solo lo refuerza. */

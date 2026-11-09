@@ -3,20 +3,23 @@ import { rxResource, takeUntilDestroyed, toSignal } from '@angular/core/rxjs-int
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CatalogApi, formatCop } from '../../../../core/catalog';
 import { resourceApiError } from '../../../../core/http';
+import {
+  Order,
+  OrderCountdown,
+  OrderStatusBadge,
+  OrdersApi,
+  cancellationMessage,
+} from '../../../../core/orders';
 import { Alert } from '../../../../shared/ui/alert/alert';
 import { Button } from '../../../../shared/ui/button/button';
 import { Card } from '../../../../shared/ui/card/card';
 import { EmptyState } from '../../../../shared/ui/empty-state/empty-state';
 import { PageHeader } from '../../../../shared/ui/page-header/page-header';
 import { ResourceState } from '../../../../shared/ui/resource-state/resource-state';
-import { OrderCountdown } from '../../components/order-countdown/order-countdown';
-import { OrderStatusBadge } from '../../components/order-status-badge/order-status-badge';
 import { OrderSubOrders } from '../../components/order-sub-orders/order-sub-orders';
-import { ORDER_POLL_INTERVAL_MS, Order } from '../../models/pedidos.types';
-import { PedidosApi } from '../../services/pedidos-api';
+import { ORDER_POLL_INTERVAL_MS } from '../../models/pedidos.types';
 import { formatDateTime } from '../../utils/format-date';
 import { isObjectId } from '../../utils/object-id';
-import { cancellationMessage } from '../../utils/order-status';
 import { loadStoreNames } from '../../utils/store-names';
 
 /**
@@ -135,7 +138,7 @@ import { loadStoreNames } from '../../utils/store-names';
   `,
 })
 export class PedidoDetalle {
-  private readonly api = inject(PedidosApi);
+  private readonly api = inject(OrdersApi);
   private readonly catalog = inject(CatalogApi);
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
@@ -158,9 +161,7 @@ export class PedidoDetalle {
   );
 
   private readonly apiError = computed(() => resourceApiError(this.resource.error()));
-  protected readonly notFound = computed(
-    () => !this.validId() || this.apiError()?.status === 404,
-  );
+  protected readonly notFound = computed(() => !this.validId() || this.apiError()?.status === 404);
   protected readonly error = this.apiError;
 
   /** Solo cambia cuando cambia el estado, no con cada respuesta del sondeo. */

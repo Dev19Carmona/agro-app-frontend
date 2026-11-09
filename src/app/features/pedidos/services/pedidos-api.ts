@@ -3,11 +3,12 @@ import { Service, inject } from '@angular/core';
 import { Observable, catchError, throwError } from 'rxjs';
 import { Page } from '../../../core/catalog';
 import { API_BASE_URL, toApiError } from '../../../core/http';
-import { Order, OrderSummary, OrdersFilter, PEDIDOS_PAGE_SIZE } from '../models/pedidos.types';
+import { Order, OrderSummary } from '../../../core/orders';
+import { OrdersFilter, PEDIDOS_PAGE_SIZE } from '../models/pedidos.types';
 import { toCheckoutError } from '../utils/checkout-error';
 
 /**
- * Cliente de `POST /orders/checkout`, `GET /orders` y `GET /orders/:id`. Los errores salen como
+ * Cliente de `POST /orders/checkout` y `GET /orders`; `GET /orders/:id` es `OrdersApi` (`core/orders`). Los errores salen como
  * `ApiError`; los del checkout como `CheckoutApiError` (con las líneas inválidas, si las hay).
  *
  * El backend valida la query con un esquema estricto: solo se envían los parámetros con valor.
@@ -32,10 +33,6 @@ export class PedidosApi {
       params = params.set('status', filter.status);
     }
     return this.request(this.http.get<Page<OrderSummary>>(this.base, { params }));
-  }
-
-  getOrder(id: string): Observable<Order> {
-    return this.request(this.http.get<Order>(`${this.base}/${encodeURIComponent(id)}`));
   }
 
   private request<T>(source: Observable<T>): Observable<T> {

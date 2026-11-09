@@ -139,6 +139,29 @@ describe('Árbol de rutas', () => {
     },
   );
 
+  it.each(['/pedidos/5/pago', '/pagos', '/pagos/9'])(
+    'un visitante que abre %s va a login con returnUrl',
+    async (url) => {
+      const { router } = await go(url);
+      expect(router.url).toBe(`/auth/login?returnUrl=${encodeURIComponent(url)}`);
+    },
+  );
+
+  it.each<[string, AppRole]>([
+    ['/pedidos/5/pago', 'PROVEEDOR'],
+    ['/pagos', 'PROVEEDOR'],
+    ['/pagos/9', 'ADMIN'],
+  ])('%s con rol %s muestra /acceso-denegado', async (url, role) => {
+    const { router } = await go(url, role);
+    expect(router.url).toBe('/acceso-denegado');
+  });
+
+  it('/pedidos/:id/pago no queda tapada por /pedidos/:id', async () => {
+    const { h1, el } = await go('/pedidos/507f1f77bcf86cd799439011/pago', 'PRODUCTOR');
+    expect(h1).toBe('Pagar pedido');
+    expect(el.textContent).not.toContain('Detalle de pedido');
+  });
+
   it.each<[string, AppRole]>([
     ['/admin/usuarios', 'PRODUCTOR'],
     ['/proveedor/productos', 'PRODUCTOR'],

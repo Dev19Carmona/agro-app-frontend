@@ -1,6 +1,6 @@
 # SPEC 08 — Módulo Pagos: pagar un pedido con el simulador e historial de pagos
 
-> **Status:** Borrador
+> **Status:** Aprobado
 > **Depends on:** SPEC 03, SPEC 04, SPEC 05, SPEC 06, SPEC 07
 > **Date:** 2026-11-08
 > **Objective:** Permitir que un `PRODUCTOR` pague un pedido `AWAITING_PAYMENT` con la pasarela simulada (método y token de prueba), vea el resultado hasta que el pedido quede confirmado y consulte su historial de pagos, reemplazando los placeholders de `/pedidos/:id/pago`, `/pagos` y `/pagos/:id`.

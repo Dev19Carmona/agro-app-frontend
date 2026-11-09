@@ -6,7 +6,7 @@ const PRODUCTOR: 'PRODUCTOR'[] = ['PRODUCTOR'];
 /**
  * Compras del productor: carrito, checkout y pedidos. Se montan en la raíz (`/carrito`,
  * `/checkout`, `/pedidos…`) porque son tres rutas de primer nivel de un mismo flujo.
- * `/pedidos/:id/pago` sigue siendo un placeholder hasta la SPEC 08.
+ * `/pedidos/:id/pago` vive en `features/pagos` (SPEC 08).
  */
 export const PEDIDOS_ROUTES: Routes = [
   {
@@ -51,10 +51,4 @@ export const PEDIDOS_ROUTES: Routes = [
     loadComponent: () =>
       import('./pages/pedido-detalle/pedido-detalle').then((m) => m.PedidoDetalle),
   },
-  placeholderRoute('pedidos/:id/pago', 'Pagar pedido', {
-    roles: PRODUCTOR,
-    description:
-      'Elección del método (tarjeta, PSE o Nequi) y pago con un token de prueba. Muestra el resultado y permite reintentar tras un rechazo o un error mientras el pedido no venza.',
-    endpoints: ['POST /payments'],
-  }),
 ];

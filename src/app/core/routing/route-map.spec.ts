@@ -156,12 +156,34 @@ describe('Mapa de rutas', () => {
     }
   });
 
-  it('lista las pantallas que aún usan el placeholder (las SPEC 06 a 09 las irán sustituyendo)', () => {
+  it('las tres pantallas de pagos ya no usan el placeholder y la de pago vive en features/pagos (SPEC 08)', () => {
+    const pagos = screens.filter(
+      ({ path }) => path === '/pedidos/:id/pago' || path.startsWith('/pagos'),
+    );
+    expect(pagos.map(({ path }) => path).sort()).toEqual([
+      '/pagos',
+      '/pagos/:id',
+      '/pedidos/:id/pago',
+    ]);
+    // El bundler renombra los archivos de los chunks: se comprueba la clase que carga cada ruta.
+    const expected: Record<string, string> = {
+      '/pedidos/:id/pago': 'PagarPedido',
+      '/pagos': 'MisPagos',
+      '/pagos/:id': 'PagoDetalle',
+    };
+    for (const { path, route } of pagos) {
+      expect(String(route.loadComponent), `${path}: sigue siendo placeholder`).toContain(
+        `m.${expected[path]}`,
+      );
+    }
+  });
+
+  it('lista las pantallas que aún usan el placeholder (las SPEC 09 las irá sustituyendo)', () => {
     const pending = screens
       .filter(({ route }) => String(route.loadComponent).includes('route-placeholder'))
       .map(({ path }) => path);
     console.info(`Pantallas con placeholder: ${pending.length} de ${screens.length}`);
-    // A medida que las SPEC 06 a 09 las maquetan este número baja a 0.
+    // Con la SPEC 09 (administración) este número baja a 0.
     expect(pending.length).toBeLessThanOrEqual(screens.length);
     expect(pending.every((path) => SPEC_ROUTES.includes(path))).toBe(true);
   });

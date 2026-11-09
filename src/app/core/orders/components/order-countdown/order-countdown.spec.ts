@@ -4,7 +4,10 @@ import { OrderCountdown } from './order-countdown';
 
 @Component({
   imports: [OrderCountdown],
-  template: `<app-order-countdown [expiresAt]="expiresAt()" (expired)="expiredCount = expiredCount + 1" />`,
+  template: `<app-order-countdown
+    [expiresAt]="expiresAt()"
+    (expired)="expiredCount = expiredCount + 1"
+  />`,
 })
 class Host {
   expiresAt = signal('');
