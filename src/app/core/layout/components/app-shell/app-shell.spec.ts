@@ -98,6 +98,7 @@ describe('AppShell', () => {
       'Carrito',
       'Pedidos',
       'Pagos',
+      'Notificaciones',
       'Mi cuenta',
     ]);
   });

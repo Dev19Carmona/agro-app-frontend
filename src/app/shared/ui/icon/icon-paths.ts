@@ -52,6 +52,7 @@ export const ICON_PATHS = {
   grid: ['M4 4h6v6H4z', 'M14 4h6v6h-6z', 'M4 14h6v6H4z', 'M14 14h6v6h-6z'],
   'log-in': ['M14 4h5v16h-5', 'M4 12h11', 'M11 8l4 4-4 4'],
   'log-out': ['M10 4H5v16h5', 'M9 12h11', 'M16 8l4 4-4 4'],
+  bell: ['M6 16V11a6 6 0 0 1 12 0v5l2 2H4z', 'M10 21h4'],
   inbox: ['M3 13l3-8h12l3 8', 'M3 13v6h18v-6', 'M3 13h5a4 4 0 0 0 8 0h5'],
   alert: ['M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18z', 'M12 8v5', 'M12 16h.01'],
   shield: ['M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6z'],

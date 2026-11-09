@@ -66,5 +66,6 @@ export const NAV_ITEMS: readonly NavItem[] = [
   // Cuenta
   item('Cuenta', 'Iniciar sesión', '/auth/login', 'log-in', ['VISITANTE']),
   item('Cuenta', 'Registrarse', '/auth/registro', 'plus', ['VISITANTE']),
+  item('Cuenta', 'Notificaciones', '/notificaciones', 'bell', ['PRODUCTOR', 'PROVEEDOR']),
   item('Cuenta', 'Mi cuenta', '/cuenta', 'user', LOGGED),
 ];

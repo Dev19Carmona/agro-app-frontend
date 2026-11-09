@@ -1,6 +1,6 @@
 # SPEC 01 — Skill `ui-component` y componente `<app-table>` sobre Angular Material
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** Ninguna
 > **Date:** 2026-11-08
 > **Revisión:** 2026-11-08 — la librería de UI pasa de PrimeNG a Angular Material (ver "Por qué cambió el alcance").

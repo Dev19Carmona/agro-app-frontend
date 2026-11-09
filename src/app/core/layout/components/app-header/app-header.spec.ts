@@ -71,3 +71,31 @@ describe('AppHeader · carrito', () => {
     expect(empty.cartLink()?.getAttribute('aria-label')).toBe('Carrito, 0 líneas');
   });
 });
+
+describe('AppHeader · campana de notificaciones', () => {
+  afterEach(() => localStorage.clear());
+  const bell = (el: HTMLElement) => el.querySelector('app-notification-bell');
+
+  it('no la muestra al visitante', () => {
+    expect(bell(setup().el)).toBeNull();
+  });
+
+  it('no la muestra al administrador', async () => {
+    const ctx = await (async () => {
+      const c = setup();
+      await c.signIn('ADMIN');
+      return c;
+    })();
+    expect(bell(ctx.el)).toBeNull();
+  });
+
+  it('la muestra al productor y al proveedor', async () => {
+    const productor = setup();
+    await productor.signIn('PRODUCTOR');
+    expect(bell(productor.el)).not.toBeNull();
+    TestBed.resetTestingModule();
+    const proveedor = setup();
+    await proveedor.signIn('PROVEEDOR');
+    expect(bell(proveedor.el)).not.toBeNull();
+  });
+});

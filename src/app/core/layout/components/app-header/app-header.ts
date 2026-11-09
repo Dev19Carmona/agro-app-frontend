@@ -6,7 +6,7 @@ import { Menu } from '../../../../shared/ui/menu/menu';
 import { MenuItem } from '../../../../shared/ui/menu/menu.types';
 import { LogoutService, SessionService } from '../../../auth';
 import { CartService } from '../../../cart';
-
+import { NotificationBell } from '../../../notifications';
 import { ThemeMenu } from '../../../theme';
 
 const USER_ITEMS: MenuItem[] = [
@@ -17,11 +17,12 @@ const USER_ITEMS: MenuItem[] = [
 /**
  * Cabecera: marca, tema, acceso del usuario y, bajo `lg`, el botón que abre el panel de
  * navegación. El visitante ve **Iniciar sesión**; con sesión, un menú con su nombre. El
- * `PRODUCTOR` ve además el enlace al carrito con el número de líneas.
+ * `PRODUCTOR` ve además el enlace al carrito con el número de líneas, y el `PRODUCTOR` y el
+ * `PROVEEDOR` la campana de notificaciones.
  */
 @Component({
   selector: 'app-header',
-  imports: [RouterLink, Button, Icon, Menu, ThemeMenu],
+  imports: [RouterLink, Button, Icon, Menu, NotificationBell, ThemeMenu],
   template: `
     <header
       class="sticky top-3 z-10 flex h-16 items-center justify-between gap-2 rounded-xl border border-line bg-surface/90 px-3 backdrop-blur sm:px-4"
@@ -60,6 +61,10 @@ const USER_ITEMS: MenuItem[] = [
               >
             }
           </a>
+        }
+
+        @if (session.role() === 'PRODUCTOR' || session.role() === 'PROVEEDOR') {
+          <app-notification-bell />
         }
 
         @if (session.user(); as user) {

@@ -36,7 +36,7 @@ describe('NavigationService', () => {
     expect(groupsFor('PRODUCTOR')).toEqual([
       { name: 'Explorar', labels: ['Catálogo', 'Ofertas', 'Tiendas'] },
       { name: 'Compras', labels: ['Carrito', 'Pedidos', 'Pagos'] },
-      { name: 'Cuenta', labels: ['Mi cuenta'] },
+      { name: 'Cuenta', labels: ['Notificaciones', 'Mi cuenta'] },
     ]);
   });
 
@@ -44,7 +44,7 @@ describe('NavigationService', () => {
     expect(groupsFor('PROVEEDOR')).toEqual([
       { name: 'Explorar', labels: ['Catálogo', 'Ofertas', 'Tiendas'] },
       { name: 'Mi tienda', labels: ['Mi tienda', 'Productos', 'Pedidos recibidos'] },
-      { name: 'Cuenta', labels: ['Mi cuenta'] },
+      { name: 'Cuenta', labels: ['Notificaciones', 'Mi cuenta'] },
     ]);
   });
 
