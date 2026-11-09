@@ -1,6 +1,6 @@
 # SPEC 02 — Tema MongoDB claro/oscuro, layout y árbol de rutas del MVP
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** SPEC 01
 > **Date:** 2026-11-08
 > **Objective:** Construir la base visual y de navegación del MVP de Mini-Croper (tema claro/oscuro con la identidad de mongodb.com/es, layout responsive con header + panel derecho + contenido, componentes UI base y el árbol completo de rutas lazy con pantallas placeholder) sin ninguna lógica de negocio.

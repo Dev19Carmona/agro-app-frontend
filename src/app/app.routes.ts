@@ -48,6 +48,11 @@ export const routes: Routes = [
         loadChildren: () => import('./features/pagos').then((m) => m.PAGOS_ROUTES),
       },
       {
+        path: 'notificaciones',
+        loadChildren: () =>
+          import('./features/notificaciones').then((m) => m.NOTIFICACIONES_ROUTES),
+      },
+      {
         path: 'proveedor',
         loadChildren: () => import('./features/proveedor').then((m) => m.PROVEEDOR_ROUTES),
       },
@@ -128,6 +133,15 @@ export const routes: Routes = [
         path: 'ui/empty-state',
         loadComponent: () =>
           import('./shared/ui/empty-state/empty-state-demo').then((m) => m.EmptyStateDemo),
+      },
+
+      {
+        path: 'ui/popover',
+        loadComponent: () => import('./shared/ui/popover/popover-demo').then((m) => m.PopoverDemo),
+      },
+      {
+        path: 'ui/toast',
+        loadComponent: () => import('./shared/ui/toast/toast-demo').then((m) => m.ToastDemo),
       },
 
       {

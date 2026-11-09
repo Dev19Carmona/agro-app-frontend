@@ -1,10 +1,19 @@
-import { Component, DestroyRef, DOCUMENT, ElementRef, inject, signal, viewChild } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  DOCUMENT,
+  ElementRef,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, skip } from 'rxjs';
 import { Button } from '../../../../shared/ui/button/button';
 import { Drawer } from '../../../../shared/ui/drawer/drawer';
 import { Icon } from '../../../../shared/ui/icon/icon';
+import { NotificationsService } from '../../../notifications';
 import { AppHeader } from '../app-header/app-header';
 import { AppSidePanel } from '../app-side-panel/app-side-panel';
 
@@ -50,7 +59,9 @@ const LG_QUERY = '(min-width: 1024px)';
           <app-header [panelOpen]="drawerOpen()" (panelToggle)="drawerOpen.set(!drawerOpen())" />
         </div>
 
-        <div class="mx-auto flex w-full max-w-[96rem] flex-1 items-start gap-6 px-4 pt-4 pb-8 lg:px-6">
+        <div
+          class="mx-auto flex w-full max-w-[96rem] flex-1 items-start gap-6 px-4 pt-4 pb-8 lg:px-6"
+        >
           <main id="main-content" #main tabindex="-1" class="min-w-0 flex-1 outline-none">
             <router-outlet />
           </main>
@@ -75,6 +86,11 @@ export class AppShell {
   protected readonly drawerOpen = signal(false);
 
   constructor() {
+    // Sondeo de avisos: solo corre con sesión de PRODUCTOR o PROVEEDOR y se detiene al salir del shell.
+    const notifications = inject(NotificationsService);
+    notifications.start();
+    this.destroyRef.onDestroy(() => notifications.stop());
+
     // Al pasar a una pantalla grande el panel ya es fijo: el drawer debe cerrarse.
     const query = inject(DOCUMENT).defaultView?.matchMedia?.(LG_QUERY);
     if (query) {

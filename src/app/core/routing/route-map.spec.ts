@@ -32,6 +32,7 @@ async function collectLeaves(tree: Routes, prefix = ''): Promise<Leaf[]> {
 
 /** Mapa de rutas de SPEC 02 ("Mapa de rutas"): las 30 pantallas de negocio. */
 const SPEC_ROUTES = [
+  '/notificaciones',
   '/catalogo',
   '/catalogo/productos/:id',
   '/catalogo/ofertas',

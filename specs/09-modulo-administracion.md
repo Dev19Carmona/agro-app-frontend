@@ -1,6 +1,6 @@
 # SPEC 09 — Módulo Administración: usuarios, categorías, tiendas, pedidos y pagos
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** SPEC 03, SPEC 04, SPEC 05, SPEC 06, SPEC 07, SPEC 08
 > **Date:** 2026-11-08
 > **Objective:** Reemplazar los nueve placeholders de `/admin/*` por pantallas reales con las que un `ADMIN` gestiona usuarios (aprobar, rechazar, deshabilitar, habilitar y cambiar rol), categorías y tiendas, y consulta en solo lectura todos los pedidos y pagos, conectadas a los endpoints de administración del backend.
