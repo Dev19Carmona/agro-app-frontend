@@ -1,11 +1,11 @@
-import { Component, inject, input, output } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Button } from '../../../../shared/ui/button/button';
 import { Icon } from '../../../../shared/ui/icon/icon';
 import { Menu } from '../../../../shared/ui/menu/menu';
 import { MenuItem } from '../../../../shared/ui/menu/menu.types';
-import { LogoutService } from '../../../auth';
-import { SessionService } from '../../../auth';
+import { LogoutService, SessionService } from '../../../auth';
+import { CartService } from '../../../cart';
 
 import { ThemeMenu } from '../../../theme';
 
@@ -16,7 +16,8 @@ const USER_ITEMS: MenuItem[] = [
 
 /**
  * Cabecera: marca, tema, acceso del usuario y, bajo `lg`, el botón que abre el panel de
- * navegación. El visitante ve **Iniciar sesión**; con sesión, un menú con su nombre.
+ * navegación. El visitante ve **Iniciar sesión**; con sesión, un menú con su nombre. El
+ * `PRODUCTOR` ve además el enlace al carrito con el número de líneas.
  */
 @Component({
   selector: 'app-header',
@@ -40,6 +41,26 @@ const USER_ITEMS: MenuItem[] = [
 
       <div class="flex items-center gap-1 sm:gap-2">
         <app-theme-menu />
+
+        @if (session.role() === 'PRODUCTOR') {
+          <a
+            app-button
+            class="relative"
+            variant="ghost"
+            iconOnly
+            routerLink="/carrito"
+            [ariaLabel]="cartLabel()"
+          >
+            <app-icon name="cart" />
+            @if (cart.count() > 0) {
+              <span
+                aria-hidden="true"
+                class="absolute -top-1 -right-1 inline-flex h-5 min-w-5 items-center justify-center rounded-pill bg-brand px-1 text-xs font-semibold text-on-brand"
+                >{{ cart.count() }}</span
+              >
+            }
+          </a>
+        }
 
         @if (session.user(); as user) {
           <!-- Con nombre desde sm; solo icono por debajo, para que quepa en 360 px. -->
@@ -88,10 +109,16 @@ const USER_ITEMS: MenuItem[] = [
 })
 export class AppHeader {
   protected readonly session = inject(SessionService);
+  protected readonly cart = inject(CartService);
   private readonly logout = inject(LogoutService);
   private readonly router = inject(Router);
 
   protected readonly userItems = USER_ITEMS;
+
+  protected readonly cartLabel = computed(() => {
+    const n = this.cart.count();
+    return `Carrito, ${n} ${n === 1 ? 'línea' : 'líneas'}`;
+  });
 
   /** Si el panel (drawer) está abierto; solo afecta al estado del botón. */
   readonly panelOpen = input(false);

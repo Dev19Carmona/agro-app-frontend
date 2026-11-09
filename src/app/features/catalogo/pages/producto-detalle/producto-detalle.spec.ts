@@ -151,14 +151,108 @@ describe('ProductoDetalle', () => {
   it('con sesión no se muestra el aviso', async () => {
     TestBed.inject(SessionService).start({ accessToken: 'a', refreshToken: 'r' }, USER);
     await open(ID);
+    http.expectOne('/api/orders/cart').flush({ items: [], total: 0 });
     await load(detail());
     expect(text()).not.toContain('Inicia sesión para comprar');
   });
 
-  it('nunca ofrece "Agregar al carrito"', async () => {
+  it('el visitante no ve cantidad ni "Agregar al carrito"', async () => {
     await open(ID);
     await load(detail());
     expect(text()).not.toContain('Agregar al carrito');
+    expect(root().querySelector('input[type="number"]')).toBeNull();
+  });
+
+  describe('como PRODUCTOR', () => {
+    const addButtons = () =>
+      [...root().querySelectorAll('button')].filter((b) =>
+        b.textContent?.includes('Agregar al carrito'),
+      );
+    const cartLine = (variantId: string, cantidad: number) => ({
+      variantId,
+      cantidad,
+      disponible: 4,
+      apta: true,
+    });
+
+    async function openAsBuyer(
+      product: ProductDetail = detail(),
+      items: ReturnType<typeof cartLine>[] = [],
+    ) {
+      TestBed.inject(SessionService).start({ accessToken: 'a', refreshToken: 'r' }, USER);
+      await open(ID);
+      http.expectOne('/api/orders/cart').flush({ items, total: 0 });
+      await load(product);
+    }
+
+    /** Pulsa Agregar y responde el PUT y la recarga del carrito. */
+    async function addAndReply(finalQuantity: number, cartAfter: ReturnType<typeof cartLine>[]) {
+      addButtons()[0].click();
+      const put = await vi.waitFor(() => http.expectOne('/api/orders/cart/items/v1'));
+      expect(put.request.body).toEqual({ cantidad: finalQuantity });
+      put.flush({ variantId: 'v1', cantidad: finalQuantity });
+      const reload = await vi.waitFor(() => http.expectOne('/api/orders/cart'));
+      reload.flush({ items: cartAfter, total: 0 });
+      await vi.waitFor(() => {
+        harness.detectChanges();
+        expect(text()).toContain('Agregado al carrito');
+      });
+    }
+
+    it('ve cantidad y "Agregar al carrito" solo en presentaciones con stock', async () => {
+      await openAsBuyer();
+      expect(addButtons().length).toBe(1);
+      expect(root().querySelectorAll('input[type="number"]').length).toBe(1);
+    });
+
+    it('un producto a cotizar no ofrece compra', async () => {
+      await openAsBuyer(detail({ requiresQuote: true }));
+      expect(addButtons().length).toBe(0);
+    });
+
+    it('agregar una presentación nueva envía la cantidad pedida y lo anuncia', async () => {
+      await openAsBuyer();
+      await addAndReply(1, [cartLine('v1', 1)]);
+      expect(text()).toContain('Agregado al carrito');
+      expect(root().querySelector('a[href="/carrito"]')).not.toBeNull();
+    });
+
+    it('agregarla otra vez suma a la cantidad existente', async () => {
+      await openAsBuyer(detail(), [cartLine('v1', 2)]);
+      await addAndReply(3, [cartLine('v1', 3)]);
+      expect(text()).toContain('3 en total');
+    });
+
+    it('si pasa de 1000 queda en 1000 con un aviso', async () => {
+      await openAsBuyer(detail(), [cartLine('v1', 1000)]);
+      await addAndReply(1000, [cartLine('v1', 1000)]);
+      expect(text()).toContain('se limitó a 1000');
+    });
+
+    it('pedir más que la disponibilidad avisa y aun así agrega', async () => {
+      await openAsBuyer(detail(), [cartLine('v1', 4)]);
+      await addAndReply(5, [cartLine('v1', 5)]);
+      expect(text()).toContain('Supera la disponibilidad actual');
+    });
+
+    it('un error del backend se muestra en un aviso de error', async () => {
+      await openAsBuyer();
+      addButtons()[0].click();
+      const put = await vi.waitFor(() => http.expectOne('/api/orders/cart/items/v1'));
+      put.flush({ message: 'Máximo 50 líneas' }, { status: 400, statusText: 'Bad Request' });
+      await settle();
+      expect(text()).toContain('Máximo 50 líneas');
+      expect(root().querySelector('[role="alert"]')).not.toBeNull();
+    });
+
+    it('con 50 líneas avisa antes de intentar agregar otra presentación', async () => {
+      const lines = Array.from({ length: 50 }, (_, i) => cartLine(`x${i}`, 1));
+      await openAsBuyer(detail(), lines);
+      addButtons()[0].click();
+      await settle();
+      expect(text()).toContain('El carrito ya tiene 50 líneas');
+      http.expectNone('/api/orders/cart/items/v1');
+    });
   });
 
   it('un producto a cotizar muestra "Precio a cotizar", sin precios y sin aviso de compra', async () => {
