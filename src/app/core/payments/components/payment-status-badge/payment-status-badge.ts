@@ -1,6 +1,6 @@
 import { Component, computed, input } from '@angular/core';
 import { Badge } from '../../../../shared/ui/badge/badge';
-import { PaymentStatus } from '../../models/pagos.types';
+import { PaymentStatus } from '../../models/payments.types';
 import { paymentStatusLabel, paymentStatusTone } from '../../utils/payment-status';
 
 /** Estado de un pago como badge: el significado va en el texto y el color solo lo refuerza. */

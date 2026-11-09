@@ -1,11 +1,11 @@
 import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { formatCop } from '../../../../core/catalog';
+import { formatCop } from '../../../catalog';
 import { Card } from '../../../../shared/ui/card/card';
 import { Table } from '../../../../shared/ui/table/table';
 import { TableCell } from '../../../../shared/ui/table/table-cell';
 import { TableColumn } from '../../../../shared/ui/table/table.types';
-import { OrderItem, SubOrder } from '../../../../core/orders';
+import { OrderItem, SubOrder } from '../../models/orders.types';
 
 /**
  * Ítems de un pedido por tienda, tal como se compraron (snapshot): nombre, presentación, unidad,

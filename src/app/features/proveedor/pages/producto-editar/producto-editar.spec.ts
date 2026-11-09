@@ -3,12 +3,13 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { MyProduct, MyStore, MyVariant } from '../../models/proveedor.types';
+import { MyProduct, MyVariant } from '../../models/proveedor.types';
+import type { StoreDetail } from '../../../../core/catalog';
 import { ProductoEditar } from './producto-editar';
 
 const ID = '507f1f77bcf86cd799439031';
 const OTHER = '507f1f77bcf86cd799439032';
-const STORE: MyStore = {
+const STORE: StoreDetail = {
   id: '507f1f77bcf86cd799439011',
   nombre: 'Agro Sur',
   nit: '900123',
@@ -64,7 +65,7 @@ async function setup(id = ID) {
     await harness.fixture.whenStable();
     harness.detectChanges();
   };
-  const respond = async (opts: { store?: MyStore | 'none'; products?: MyProduct[] } = {}) => {
+  const respond = async (opts: { store?: StoreDetail | 'none'; products?: MyProduct[] } = {}) => {
     const store = opts.store ?? STORE;
     const storeReq = http.expectOne('/api/catalog/my-store');
     if (store === 'none') {
@@ -134,7 +135,9 @@ describe('ProductoEditar', () => {
   it('guardar el stock de una presentación actualiza solo esa fila con la respuesta', async () => {
     const { el, respond, settle, http } = await setup();
     await respond({
-      products: [{ ...PRODUCT, variantes: [VARIANT, { ...VARIANT, id: 'v2', presentacion: 'Saco' }] }],
+      products: [
+        { ...PRODUCT, variantes: [VARIANT, { ...VARIANT, id: 'v2', presentacion: 'Saco' }] },
+      ],
     });
     const editor = el.querySelectorAll('app-variant-editor')[0];
     const field = Array.from(editor.querySelectorAll('mat-form-field'))

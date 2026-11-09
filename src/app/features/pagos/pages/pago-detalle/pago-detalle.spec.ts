@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { Order, OrderStatus } from '../../../../core/orders';
-import { Payment, PaymentStatus } from '../../models/pagos.types';
+import { Payment, PaymentStatus } from '../../../../core/payments';
 import { PagoDetalle } from './pago-detalle';
 
 const ID = '607f1f77bcf86cd799439022';

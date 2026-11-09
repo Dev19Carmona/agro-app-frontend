@@ -1,7 +1,7 @@
 import type { ApiError } from '../../../core/http';
-import { PAYMENT_POLL_INTERVAL_MS, PAYMENT_POLL_MAX_MS, Payment } from '../models/pagos.types';
+import { PAYMENT_POLL_INTERVAL_MS, PAYMENT_POLL_MAX_MS } from '../models/pagos.types';
+import { Payment, isPaymentSettled } from '../../../core/payments';
 import type { PagosApi } from '../services/pagos-api';
-import { isPaymentSettled } from './payment-status';
 import { nextPollInterval, withinPollWindow } from './poll';
 
 /**

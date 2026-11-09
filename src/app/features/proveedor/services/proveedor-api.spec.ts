@@ -66,9 +66,7 @@ describe('ProveedorApi', () => {
     it('recorre las páginas hasta encontrarlo', () => {
       let result: MyProduct | undefined;
       api.getMyProduct(ID).subscribe((p) => (result = p));
-      http
-        .expectOne((r) => r.params.get('page') === '1')
-        .flush(page([{ id: OTHER }], 1, 2));
+      http.expectOne((r) => r.params.get('page') === '1').flush(page([{ id: OTHER }], 1, 2));
       http
         .expectOne((r) => r.params.get('page') === '2')
         .flush(page([{ id: ID, nombre: 'Semilla' }], 2, 2));
@@ -152,7 +150,10 @@ describe('ProveedorApi', () => {
     });
     http
       .expectOne('/api/catalog/stores')
-      .flush({ statusCode: 409, message: 'El NIT ya existe' }, { status: 409, statusText: 'Conflict' });
+      .flush(
+        { statusCode: 409, message: 'El NIT ya existe' },
+        { status: 409, statusText: 'Conflict' },
+      );
     expect(error).toEqual({ status: 409, message: 'El NIT ya existe' });
   });
 

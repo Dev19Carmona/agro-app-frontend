@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { formatCop } from '../../../../core/catalog';
-import { Payment } from '../../models/pagos.types';
+import { Payment } from '../../../../core/payments';
 import { PaymentSummary } from './payment-summary';
 
 const PAYMENT: Payment = {

@@ -6,7 +6,8 @@ import { Input } from '../../../../shared/ui/input/input';
 import { Select } from '../../../../shared/ui/select/select';
 import { SelectOption } from '../../../../shared/ui/select/select.types';
 import { CUSTOM_TOKEN_ID, DEFAULT_SCENARIO_ID, TEST_SCENARIOS } from '../../config/test-scenarios';
-import { CUSTOM_TOKEN_MAX_LENGTH, PaymentMethod } from '../../models/pagos.types';
+import { CUSTOM_TOKEN_MAX_LENGTH } from '../../models/pagos.types';
+import { PaymentMethod } from '../../../../core/payments';
 
 /** Método y token elegidos al enviar el formulario. */
 export interface PaymentFormValue {

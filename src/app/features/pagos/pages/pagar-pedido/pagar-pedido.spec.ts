@@ -8,7 +8,7 @@ import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { Order, OrderStatus } from '../../../../core/orders';
 import { PaymentForm } from '../../components/payment-form/payment-form';
-import { Payment, PaymentStatus } from '../../models/pagos.types';
+import { Payment, PaymentStatus } from '../../../../core/payments';
 import { PagarPedido } from './pagar-pedido';
 
 const ID = '507f1f77bcf86cd799439011';

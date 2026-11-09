@@ -20,11 +20,10 @@ import { EmptyState } from '../../../../shared/ui/empty-state/empty-state';
 import { PageHeader } from '../../../../shared/ui/page-header/page-header';
 import { ResourceState } from '../../../../shared/ui/resource-state/resource-state';
 import { PaymentSummary } from '../../components/payment-summary/payment-summary';
-import { Payment } from '../../models/pagos.types';
+import { Payment, isPaymentSettled } from '../../../../core/payments';
 import { PagosApi } from '../../services/pagos-api';
 import { isObjectId } from '../../utils/filter-params';
 import { startPaymentPolling } from '../../utils/payment-polling';
-import { isPaymentSettled } from '../../utils/payment-status';
 
 /**
  * `/pagos/:id`: datos del pago (estado, monto, método, referencia, motivo y fecha), enlace a su

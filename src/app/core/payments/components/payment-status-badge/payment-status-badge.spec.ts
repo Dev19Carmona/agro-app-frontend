@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { PaymentStatus } from '../../models/pagos.types';
+import { PaymentStatus } from '../../models/payments.types';
 import { PaymentStatusBadge } from './payment-status-badge';
 
 @Component({

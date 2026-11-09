@@ -1,4 +1,5 @@
 export { OrderCountdown } from './components/order-countdown/order-countdown';
+export { OrderSubOrders } from './components/order-sub-orders/order-sub-orders';
 export { OrderStatusBadge } from './components/order-status-badge/order-status-badge';
 export { ORDER_PAYMENT_WINDOW_MS } from './models/orders.types';
 export type { Order, OrderItem, OrderStatus, OrderSummary, SubOrder } from './models/orders.types';

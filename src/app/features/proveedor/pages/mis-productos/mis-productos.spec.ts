@@ -3,11 +3,12 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { MyProduct, MyStore, MyVariant } from '../../models/proveedor.types';
+import { MyProduct, MyVariant } from '../../models/proveedor.types';
+import type { StoreDetail } from '../../../../core/catalog';
 import { MisProductos } from './mis-productos';
 
 const CAT = '507f1f77bcf86cd799439021';
-const STORE: MyStore = {
+const STORE: StoreDetail = {
   id: '507f1f77bcf86cd799439011',
   nombre: 'Agro Sur',
   nit: '900123',
@@ -72,7 +73,7 @@ async function setup(url = '/proveedor/productos') {
     harness.detectChanges();
   };
   const respond = async (
-    opts: { store?: MyStore | 'none'; products?: unknown; productsFail?: boolean } = {},
+    opts: { store?: StoreDetail | 'none'; products?: unknown; productsFail?: boolean } = {},
   ) => {
     const store = opts.store ?? STORE;
     const storeReq = http.expectOne('/api/catalog/my-store');
@@ -89,9 +90,7 @@ async function setup(url = '/proveedor/productos') {
     } else {
       productsReq.flush(opts.products ?? productsPage([product()]));
     }
-    http
-      .expectOne('/api/catalog/categories')
-      .flush([{ id: CAT, nombre: 'Fertilizantes' }]);
+    http.expectOne('/api/catalog/categories').flush([{ id: CAT, nombre: 'Fertilizantes' }]);
     await settle();
   };
   return { el, settle, respond, http, harness };
@@ -194,9 +193,7 @@ describe('MisProductos', () => {
   it('con la tienda activa, Nuevo producto es un enlace', async () => {
     const { el, respond } = await setup();
     await respond();
-    expect(
-      el.querySelector('app-page-header a[href="/proveedor/productos/nuevo"]'),
-    ).not.toBeNull();
+    expect(el.querySelector('app-page-header a[href="/proveedor/productos/nuevo"]')).not.toBeNull();
   });
 
   it('sin conexión muestra el error con Reintentar', async () => {

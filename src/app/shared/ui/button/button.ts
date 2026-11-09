@@ -18,6 +18,7 @@ const VARIANT_CLASSES: Record<ButtonVariant, string> = {
   primary: 'bg-brand text-on-brand hover:bg-brand-hover',
   secondary: 'border border-line-strong text-fg hover:bg-sunken',
   ghost: 'text-fg hover:bg-sunken',
+  danger: 'border border-danger text-danger hover:bg-danger/10',
 };
 
 const SIZE_CLASSES: Record<ButtonSize, string> = {

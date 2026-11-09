@@ -121,6 +121,10 @@ export const routes: Routes = [
           import('./shared/ui/pagination/pagination-demo').then((m) => m.PaginationDemo),
       },
       {
+        path: 'ui/dialog',
+        loadComponent: () => import('./shared/ui/dialog/dialog-demo').then((m) => m.DialogDemo),
+      },
+      {
         path: 'ui/empty-state',
         loadComponent: () =>
           import('./shared/ui/empty-state/empty-state-demo').then((m) => m.EmptyStateDemo),

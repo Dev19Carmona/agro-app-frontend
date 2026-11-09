@@ -6,7 +6,7 @@ import { Router, provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { Input } from '../../../../shared/ui/input/input';
 import { Select } from '../../../../shared/ui/select/select';
-import { Payment, PaymentStatus } from '../../models/pagos.types';
+import { Payment, PaymentStatus } from '../../../../core/payments';
 import { MisPagos } from './mis-pagos';
 
 const ORDER_ID = '507f1f77bcf86cd799439011';

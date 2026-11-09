@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { Payment, PaymentStatus } from '../../models/pagos.types';
+import { Payment, PaymentStatus } from '../../../../core/payments';
 import { PaymentResult } from './payment-result';
 
 function payment(status: PaymentStatus, extra: Partial<Payment> = {}): Payment {

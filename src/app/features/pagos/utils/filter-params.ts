@@ -1,5 +1,5 @@
 import { PaymentsFilter } from '../models/pagos.types';
-import { isPaymentStatus } from './payment-status';
+import { isPaymentStatus } from '../../../core/payments';
 
 interface ParamReader {
   get(name: string): string | null;

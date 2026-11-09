@@ -11,14 +11,13 @@ import {
   throwError,
   throwIfEmpty,
 } from 'rxjs';
-import { Page } from '../../../core/catalog';
+import { Page, type StoreDetail } from '../../../core/catalog';
 import { API_BASE_URL, ApiError, toApiError } from '../../../core/http';
 import {
   CreateProductRequest,
   CreateStoreRequest,
   CreateVariantRequest,
   MyProduct,
-  MyStore,
   MyVariant,
   PROVEEDOR_PAGE_SIZE,
   ProductView,
@@ -44,12 +43,12 @@ export class ProveedorApi {
   private readonly orders = `${inject(API_BASE_URL)}/orders/provider/sub-orders`;
 
   /** `404` si el proveedor aún no tiene tienda. */
-  getMyStore(): Observable<MyStore> {
-    return this.request(this.http.get<MyStore>(`${this.catalog}/my-store`));
+  getMyStore(): Observable<StoreDetail> {
+    return this.request(this.http.get<StoreDetail>(`${this.catalog}/my-store`));
   }
 
-  createStore(body: CreateStoreRequest): Observable<MyStore> {
-    return this.request(this.http.post<MyStore>(`${this.catalog}/stores`, body));
+  createStore(body: CreateStoreRequest): Observable<StoreDetail> {
+    return this.request(this.http.post<StoreDetail>(`${this.catalog}/stores`, body));
   }
 
   /** Productos propios, activos e inactivos, con todas sus presentaciones. */
@@ -124,7 +123,9 @@ export class ProveedorApi {
   }
 
   getSubOrder(id: string): Observable<ProviderSubOrder> {
-    return this.request(this.http.get<ProviderSubOrder>(`${this.orders}/${encodeURIComponent(id)}`));
+    return this.request(
+      this.http.get<ProviderSubOrder>(`${this.orders}/${encodeURIComponent(id)}`),
+    );
   }
 
   private pageParams(page: number, limit: number): HttpParams {

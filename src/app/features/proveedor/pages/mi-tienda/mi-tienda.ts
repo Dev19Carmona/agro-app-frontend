@@ -10,7 +10,7 @@ import { Card } from '../../../../shared/ui/card/card';
 import { PageHeader } from '../../../../shared/ui/page-header/page-header';
 import { ResourceState } from '../../../../shared/ui/resource-state/resource-state';
 import { StoreForm } from '../../components/store-form/store-form';
-import { MyStore } from '../../models/proveedor.types';
+import type { StoreDetail } from '../../../../core/catalog';
 import { ProveedorApi } from '../../services/proveedor-api';
 import { formatDate } from '../../utils/format-date';
 
@@ -106,12 +106,12 @@ export class MiTienda {
   private readonly refresher = inject(SessionRefresher);
 
   protected readonly resource = rxResource({ stream: () => this.api.getMyStore() });
-  private readonly created = signal<MyStore | null>(null);
+  private readonly created = signal<StoreDetail | null>(null);
 
   protected readonly justCreated = computed(() => this.created() !== null);
   protected readonly sessionWarning = signal<string | null>(null);
 
-  protected readonly store = computed<MyStore | null>(
+  protected readonly store = computed<StoreDetail | null>(
     () => this.created() ?? (this.resource.hasValue() ? this.resource.value() : null),
   );
 
@@ -123,7 +123,7 @@ export class MiTienda {
 
   protected readonly formatDate = formatDate;
 
-  protected async onCreated(store: MyStore): Promise<void> {
+  protected async onCreated(store: StoreDetail): Promise<void> {
     this.created.set(store);
     try {
       await this.refresher.refresh();

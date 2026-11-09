@@ -62,6 +62,6 @@ import { ButtonSize, ButtonVariant } from './button.types';
   `,
 })
 export class ButtonDemo {
-  protected readonly variants: ButtonVariant[] = ['primary', 'secondary', 'ghost'];
+  protected readonly variants: ButtonVariant[] = ['primary', 'secondary', 'ghost', 'danger'];
   protected readonly sizes: ButtonSize[] = ['sm', 'md', 'lg'];
 }
