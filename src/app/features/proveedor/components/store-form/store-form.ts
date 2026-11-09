@@ -5,7 +5,7 @@ import { ApiError } from '../../../../core/http';
 import { Alert } from '../../../../shared/ui/alert/alert';
 import { Button } from '../../../../shared/ui/button/button';
 import { Input } from '../../../../shared/ui/input/input';
-import { MyStore } from '../../models/proveedor.types';
+import type { StoreDetail } from '../../../../core/catalog';
 import { ProveedorApi } from '../../services/proveedor-api';
 import { LIMITS, validateRequiredText } from '../../utils/product-validation';
 
@@ -41,7 +41,7 @@ import { LIMITS, validateRequiredText } from '../../utils/product-validation';
 export class StoreForm {
   private readonly api = inject(ProveedorApi);
 
-  readonly created = output<MyStore>();
+  readonly created = output<StoreDetail>();
 
   protected readonly error = signal<string | null>(null);
   protected readonly model = signal({ nombre: '', nit: '', municipio: '' });

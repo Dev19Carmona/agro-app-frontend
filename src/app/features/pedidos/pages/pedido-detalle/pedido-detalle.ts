@@ -16,7 +16,7 @@ import { Card } from '../../../../shared/ui/card/card';
 import { EmptyState } from '../../../../shared/ui/empty-state/empty-state';
 import { PageHeader } from '../../../../shared/ui/page-header/page-header';
 import { ResourceState } from '../../../../shared/ui/resource-state/resource-state';
-import { OrderSubOrders } from '../../components/order-sub-orders/order-sub-orders';
+import { OrderSubOrders } from '../../../../core/orders';
 import { ORDER_POLL_INTERVAL_MS } from '../../models/pedidos.types';
 import { formatDateTime } from '../../utils/format-date';
 import { isObjectId } from '../../utils/object-id';

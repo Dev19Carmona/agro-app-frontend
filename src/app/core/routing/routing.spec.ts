@@ -73,13 +73,34 @@ describe('Árbol de rutas', () => {
   });
 
   it('muestra título, rol, descripción y endpoints de una ruta con parámetro', async () => {
-    const { h1, badges, codes, title, el } = await go('/admin/usuarios/7', 'ADMIN');
-    expect(h1).toBe('Detalle de usuario');
-    expect(badges).toEqual(['Administrador']);
-    expect(codes).toContain('POST /auth/users/:id/approve');
+    // Ninguna pantalla real usa ya el placeholder (SPEC 09): se prueba con una ruta sintética.
+    TestBed.configureTestingModule({
+      providers: [
+        provideRouter([
+          placeholderRoute('demo/:id', 'Detalle de demo', {
+            roles: ['ADMIN'],
+            description: 'Pantalla de prueba con un parámetro.',
+            endpoints: ['POST /demo/:id/approve'],
+          }),
+        ]),
+        { provide: TitleStrategy, useClass: PageTitleStrategy },
+      ],
+    });
+    const harness = await RouterTestingHarness.create();
+    await harness.navigateByUrl('/demo/7');
+    harness.detectChanges();
+    const el = harness.routeNativeElement as HTMLElement;
+    const codes = Array.from(el.querySelectorAll('code')).map((c) =>
+      c.textContent?.replace(/\s+/g, ' ').trim(),
+    );
+    expect(el.querySelector('h1')?.textContent?.trim()).toBe('Detalle de demo');
+    expect(Array.from(el.querySelectorAll('app-badge')).map((b) => b.textContent?.trim())).toEqual([
+      'Administrador',
+    ]);
+    expect(codes).toContain('POST /demo/:id/approve');
     expect(codes).toContain('id = 7');
-    expect(el.textContent).toContain('Aprobar o rechazar a un proveedor pendiente');
-    expect(title).toBe('Detalle de usuario · Mini-Croper');
+    expect(el.textContent).toContain('Pantalla de prueba con un parámetro.');
+    expect(TestBed.inject(Title).getTitle()).toBe('Detalle de demo · Mini-Croper');
   });
 
   it('productos/nuevo no se confunde con productos/:id', async () => {
@@ -100,11 +121,17 @@ describe('Árbol de rutas', () => {
     ['/auth/login', 'Iniciar sesión', 'VISITANTE'],
     ['/auth/registro', 'Crear cuenta', 'VISITANTE'],
     ['/proveedor/tienda', 'Mi tienda', 'PROVEEDOR'],
-    ['/admin/pagos', 'Pagos (admin)', 'ADMIN'],
+    ['/admin/usuarios', 'Usuarios', 'ADMIN'],
   ])('%s carga su pantalla "%s"', async (url, title, role) => {
     const { h1, title: docTitle } = await go(url, role);
     expect(h1).toBe(title);
     expect(docTitle).toBe(`${title} · Mini-Croper`);
+  });
+
+  it('/admin/pagos carga su pantalla y conserva el título de la ruta', async () => {
+    const { h1, title } = await go('/admin/pagos', 'ADMIN');
+    expect(h1).toBe('Pagos');
+    expect(title).toBe('Pagos (admin) · Mini-Croper');
   });
 
   it.each(['/auth/login', '/auth/registro'])(

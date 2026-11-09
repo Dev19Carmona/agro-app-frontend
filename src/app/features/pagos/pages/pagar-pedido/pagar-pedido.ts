@@ -34,12 +34,11 @@ import { PaymentSummary } from '../../components/payment-summary/payment-summary
 import {
   ORDER_CONFIRM_POLL_INTERVAL_MS,
   ORDER_CONFIRM_POLL_MAX_MS,
-  Payment,
 } from '../../models/pagos.types';
+import { Payment, blocksNewPayment, isPaymentSettled } from '../../../../core/payments';
 import { PagosApi } from '../../services/pagos-api';
 import { isObjectId } from '../../utils/filter-params';
 import { PaymentErrorAction, toPaymentErrorAction } from '../../utils/payment-error';
-import { blocksNewPayment, isPaymentSettled } from '../../utils/payment-status';
 import { withinPollWindow } from '../../utils/poll';
 import { startPaymentPolling } from '../../utils/payment-polling';
 

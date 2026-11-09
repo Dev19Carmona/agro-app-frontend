@@ -1,5 +1,5 @@
 import type { BadgeTone } from '../../../shared/ui/badge/badge.types';
-import { PaymentMethod, PaymentStatus } from '../models/pagos.types';
+import { PaymentMethod, PaymentStatus } from '../models/payments.types';
 
 export const PAYMENT_STATUSES: readonly PaymentStatus[] = [
   'PENDING',

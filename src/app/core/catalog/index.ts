@@ -8,5 +8,6 @@ export type {
   PublicStore,
   PublicVariant,
 } from './models/catalog.types';
+export type { StoreDetail } from './models/store-detail.types';
 export { CatalogApi } from './services/catalog-api';
 export { formatCop } from './utils/format-cop';

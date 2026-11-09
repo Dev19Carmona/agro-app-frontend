@@ -3,12 +3,8 @@ import { Service, inject } from '@angular/core';
 import { Observable, catchError, throwError } from 'rxjs';
 import { Page } from '../../../core/catalog';
 import { API_BASE_URL, toApiError } from '../../../core/http';
-import {
-  CreatePaymentRequest,
-  PAGOS_PAGE_SIZE,
-  Payment,
-  PaymentsFilter,
-} from '../models/pagos.types';
+import { CreatePaymentRequest, PAGOS_PAGE_SIZE, PaymentsFilter } from '../models/pagos.types';
+import { Payment } from '../../../core/payments';
 
 /**
  * Cliente de `POST /payments`, `GET /payments` y `GET /payments/:id`. Los errores salen como

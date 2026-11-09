@@ -22,7 +22,7 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 
 ## Estructura de la app
 
-La app es el frontend del marketplace agropecuario Mini-Croper. Su backend es `agro-app-workspace` (NestJS, API en `:3000`); las reglas de negocio están en `docs/reglas-de-negocio.md` de ese repo. Auth (sesión, login, registro, cuenta y guards) y el catálogo público (`/catalogo`, detalle de producto, ofertas, tiendas y detalle de tienda) el módulo proveedor (`/proveedor/*`: tienda, productos, presentaciones, stock y pedidos recibidos) y el flujo de compra del productor (carrito, checkout, `/pedidos` y `/pedidos/:id` con sondeo y cronómetro de pago) y el módulo de pagos (`/pedidos/:id/pago` con el simulador de pasarela, `/pagos` y `/pagos/:id`) ya están conectados al backend; el resto de pantallas (administración, `/admin/*`) siguen siendo placeholders hasta la SPEC 09.
+La app es el frontend del marketplace agropecuario Mini-Croper. Su backend es `agro-app-workspace` (NestJS, API en `:3000`); las reglas de negocio están en `docs/reglas-de-negocio.md` de ese repo. Auth (sesión, login, registro, cuenta y guards) y el catálogo público (`/catalogo`, detalle de producto, ofertas, tiendas y detalle de tienda) el módulo proveedor (`/proveedor/*`: tienda, productos, presentaciones, stock y pedidos recibidos) y el flujo de compra del productor (carrito, checkout, `/pedidos` y `/pedidos/:id` con sondeo y cronómetro de pago) y el módulo de pagos (`/pedidos/:id/pago` con el simulador de pasarela, `/pagos` y `/pagos/:id`) y el módulo de administración (`/admin/*`: usuarios, categorías, tiendas, pedidos y pagos) ya están conectados al backend: la app no tiene pantallas placeholder.
 
 ```
 src/app/
@@ -33,10 +33,14 @@ src/app/
 │   │                     # safeReturnUrl, mensajes y validación de auth, tipos (SessionRole, AuthUser…)
 │   ├── cart/             # CartService (señales items, total, count, status) y CartApi, tipos del carrito y
 │   │                     # MAX_CART_QUANTITY / MAX_CART_LINES; solo importa de http y auth
-│   ├── orders/           # lectura de un pedido compartida por pedidos y pagos: tipos (Order, OrderStatus…),
+│   ├── orders/           # lectura de un pedido compartida por pedidos, pagos y admin: tipos (Order, OrderStatus…),
 │   │                     # OrdersApi (getOrder), remainingMs/formatCountdown, orderStatusLabel,
-│   │                     # OrderCountdown y OrderStatusBadge; solo importa de `core/http` y `shared/ui`
-│   ├── catalog/          # CatalogApi (services/), tipos del catálogo público y de filtros y formatCop;
+│   │                     # OrderCountdown, OrderStatusBadge y OrderSubOrders (sub-pedidos por tienda);
+│   │                     # solo importa de `core/catalog`, `core/http` y `shared/ui`
+│   ├── payments/         # tipos de pago (Payment, PaymentStatus, PaymentMethod), etiquetas y estados
+│   │                     # (paymentStatusLabel, rejectionMessage…) y PaymentStatusBadge, compartidos por
+│   │                     # `features/pagos` y `features/admin`; solo importa de `shared/ui`
+│   ├── catalog/          # CatalogApi (services/), tipos del catálogo público, de filtros y StoreDetail, y formatCop;
 │   │                     # compartidos por las features (una feature no importa de otra)
 │   ├── theme/            # ThemeService y ThemeMenu (claro/oscuro/sistema, clase .app-dark en <html>)
 │   ├── navigation/       # NAV_ITEMS, NavigationService, tipos de nav y RouteInfo
@@ -44,13 +48,13 @@ src/app/
 │   │                     # Forbidden y NotFound
 │   └── layout/           # AppShell, AppHeader, AppSidePanel y AuthLayout (sin index.ts)
 ├── features/<dominio>/   # index.ts + <dominio>.routes.ts (+ pages/<pantalla>/ si ya está maquetada)
-│                         # (catalogo, auth, cuenta, pedidos, pagos, proveedor, admin; solo admin sigue con placeholders)
+│                         # (catalogo, auth, cuenta, pedidos, pagos, proveedor, admin; todas con pantallas reales)
 └── shared/ui/            # componentes app-* (únicos que conocen Material/CDK)
 ```
 
 Detalle de carpetas, `index.ts` y dependencias en "Estructura de un módulo".
 
-- **Rutas en español**, agrupadas por dominio con `loadChildren` y cada pantalla con `loadComponent`. Cada ruta lleva `title` y `data: RouteInfo` (`roles`, `description`, `endpoints` del backend). `placeholderRoute()` crea la ruta con el placeholder; al maquetar una pantalla se cambia su `loadComponent` y se conservan `title` y `data`. `/pedidos/:id/pago` se monta en `app.routes.ts` con `loadChildren` de `features/pagos` (`PAGAR_PEDIDO_ROUTES`), antes de las rutas de `pedidos`.
+- **Rutas en español**, agrupadas por dominio con `loadChildren` y cada pantalla con `loadComponent`. Cada ruta lleva `title` y `data: RouteInfo` (`roles`, `description`, `endpoints` del backend). `placeholderRoute()` crea la ruta con el placeholder; al maquetar una pantalla se cambia su `loadComponent` y se conservan `title` y `data`. Hoy ninguna ruta lo usa (un test de `route-map.spec.ts` lo comprueba); `placeholderRoute` y `RoutePlaceholder` se conservan como patrón para pantallas futuras. `/pedidos/:id/pago` se monta en `app.routes.ts` con `loadChildren` de `features/pagos` (`PAGAR_PEDIDO_ROUTES`), antes de las rutas de `pedidos`.
 - **Añadir una pantalla:** ruta en `features/<dominio>/<dominio>.routes.ts` y, si debe verse en el panel, un ítem en `NAV_ITEMS` (`core/navigation/config/nav.config.ts`). `core/routing/route-map.spec.ts` comprueba que cada ruta tiene título, roles y endpoints, y que cada ítem del panel apunta a una ruta existente que su rol puede ver.
 - **Sesión:** `SessionService` guarda el estado con signals (`status`, `user`, `role`, `isAuthenticated`). El access token vive solo en memoria y el refresh token en `localStorage` (`agro:refresh-token`). Al arrancar, el initializer llama a `POST /auth/refresh` si hay refresh token (solo lo borra ante `400`, `401` o `403`; un error de red lo conserva). No hay cookies: los tokens viajan en el cuerpo JSON. El access token no se escribe nunca en disco ni en logs.
 - **HTTP:** `API_BASE_URL` es `/api` y `ng serve` lo reenvía al backend (`:3000`) quitando el prefijo. `authInterceptor` añade `Authorization: Bearer` solo a `/api/*` (nunca a `/auth/login`, `/auth/register` ni `/auth/refresh`), y ante `401` hace un único refresh compartido (con `navigator.locks` entre pestañas) y reintenta una vez. Con el backend apagado el proxy responde `502`: `toApiError` lo trata como "sin conexión" (`status 0`).
@@ -81,7 +85,7 @@ Cada módulo (`core/<modulo>/` o `features/<dominio>/`) usa carpetas por tipo de
 - Cada componente y cada pantalla tiene su propia carpeta. Los `*.spec.ts` van junto al archivo que prueban. Los nombres de archivo no cambian al moverlos; usa `git mv`.
 - **`index.ts`:** dentro de un módulo se importa por ruta relativa al archivo; desde fuera (otro módulo, una feature, `app.config.ts`, `app.routes.ts`, specs) solo por `index.ts` (`from '../auth'`). Si algo debe ser público, se añade al `index.ts`.
 - **Excepción lazy:** un `index.ts` nunca reexporta pantallas ni layouts cargados con `loadComponent` (Forbidden, NotFound, RoutePlaceholder, Login, Registro, Cuenta, AppShell, AuthLayout…). Se cargan con `import()` directo a su archivo para no meterlos en el bundle principal. `core/layout` no tiene `index.ts`. Las features exponen solo su constante de rutas (`import('./features/<dominio>')`).
-- **Dependencias:** `http` ← `auth` ← `navigation` ← `routing` ← `layout`, con `orders` (`http` ← `orders`) usado por `features/pedidos` y `features/pagos` (que nunca se importan entre sí), `theme` independiente (`layout` puede usarlo), `catalog` que depende solo de `http` (nunca de `auth`, `navigation`, `routing` ni `layout`) y `cart` (`http` ← `auth` ← `cart`) que solo importa de `core/http` y `core/auth`; `layout` y las features pueden usar `core/cart`. `core` y `features` pueden usar `shared/ui`; una feature usa `core` pero nunca otra feature; `core` nunca importa de `features`. Lo compartido entre features va a `core` (p. ej. `core/auth/utils/`).
+- **Dependencias:** `http` ← `auth` ← `navigation` ← `routing` ← `layout`, con `orders` (`http` ← `orders`) usado por `features/pedidos`, `features/pagos` y `features/admin` (que nunca se importan entre sí), `payments` (`shared/ui` ← `payments`) usado por `features/pagos` y `features/admin`, `theme` independiente (`layout` puede usarlo), `catalog` que depende solo de `http` (nunca de `auth`, `navigation`, `routing` ni `layout`) y `cart` (`http` ← `auth` ← `cart`) que solo importa de `core/http` y `core/auth`; `layout` y las features pueden usar `core/cart`. `core` y `features` pueden usar `shared/ui`; una feature usa `core` pero nunca otra feature; `core` nunca importa de `features`. Lo compartido entre features va a `core` (p. ej. `core/auth/utils/`).
 - `shared/ui`: una carpeta por componente (`<nombre>.ts`, `.types.ts`, `.spec.ts`, `-demo.ts`), sin barrel; `form-control/` solo contiene tipos compartidos.
 
 ## Tema y tokens
@@ -117,7 +121,7 @@ Cada módulo (`core/<modulo>/` o `features/<dominio>/`) usa carpetas por tipo de
 - Está PROHIBIDO importar `@angular/material/*` y `@angular/cdk/*` fuera de `src/app/shared/ui/`. El tema de Material vive en `src/material-theme.scss` y se registra en `angular.json`.
 - Las features y páginas consumen solo los componentes `app-*`, nunca `mat-*` ni utilidades del CDK directamente.
 - No se usa PrimeNG: se eliminó por su licencia (ver `specs/01-skill-ui-component-y-tabla.md`).
-- Componentes disponibles (cada uno con demo en `/ui/<nombre>`): `app-table`, `app-icon`, `app-button`, `app-badge`, `app-card`, `app-page-header`, `app-empty-state`, `app-menu`, `app-drawer`, `app-input`, `app-select`, `app-checkbox`, `app-alert`, `app-pagination` y `app-resource-state` (cargando, error con Reintentar, vacío o contenido). `app-input` admite `type="number"` (valor `number | null`). Antes de crear uno nuevo, revisa si ya existe o si basta ampliar uno.
+- Componentes disponibles (cada uno con demo en `/ui/<nombre>`): `app-table`, `app-icon`, `app-button`, `app-badge`, `app-card`, `app-page-header`, `app-empty-state`, `app-menu`, `app-drawer`, `app-input`, `app-select`, `app-checkbox`, `app-alert`, `app-pagination`, `app-dialog` (confirmación modal con título, descripción, contenido proyectado, foco atrapado y Esc; `confirmed` no cierra, quien lo usa pone `open` en `false`) y `app-resource-state` (cargando, error con Reintentar, vacío o contenido). `app-button` admite la variante `danger`. `app-input` admite `type="number"` (valor `number | null`). Antes de crear uno nuevo, revisa si ya existe o si basta ampliar uno.
 - Los controles sin texto visible llevan `ariaLabel`; `app-icon` es decorativo salvo que reciba `label`.
 - `app-input`, `app-select` y `app-checkbox` son controles de Signal Forms: se enlazan con `[formField]` y muestran el primer error con `message` cuando el campo está tocado. Los formularios usan `form(model, schema, { submission })` con `[formRoot]`.
 

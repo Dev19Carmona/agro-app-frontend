@@ -1,15 +1,5 @@
 import { Product } from '../../../core/catalog';
 
-/** Tienda del proveedor (espejo de `StoreView` del backend). */
-export interface MyStore {
-  id: string;
-  nombre: string;
-  nit: string;
-  ownerId: string;
-  municipio: string;
-  activa: boolean;
-  createdAt: string; // ISO
-}
 export interface CreateStoreRequest {
   nombre: string;
   nit: string;

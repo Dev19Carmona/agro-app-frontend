@@ -13,17 +13,18 @@ import { SelectOption } from '../../../../shared/ui/select/select.types';
 import { Table } from '../../../../shared/ui/table/table';
 import { TableCell } from '../../../../shared/ui/table/table-cell';
 import { TableColumn } from '../../../../shared/ui/table/table.types';
-import { PaymentStatusBadge } from '../../components/payment-status-badge/payment-status-badge';
-import { Payment, PaymentsFilter } from '../../models/pagos.types';
-import { PagosApi } from '../../services/pagos-api';
-import { isObjectId, parsePaymentsFilter, paymentsFilterQuery } from '../../utils/filter-params';
-import { formatDateTime } from '../../utils/format-date';
 import {
   PAYMENT_STATUSES,
+  Payment,
+  PaymentStatusBadge,
   isPaymentStatus,
   paymentMethodLabel,
   paymentStatusLabel,
-} from '../../utils/payment-status';
+} from '../../../../core/payments';
+import { PaymentsFilter } from '../../models/pagos.types';
+import { PagosApi } from '../../services/pagos-api';
+import { isObjectId, parsePaymentsFilter, paymentsFilterQuery } from '../../utils/filter-params';
+import { formatDateTime } from '../../utils/format-date';
 
 const STATUS_OPTIONS: readonly SelectOption[] = [
   { value: '', label: 'Todos los estados' },

@@ -19,16 +19,7 @@ import { ProveedorApi } from '../../services/proveedor-api';
  * desactivada avisa que no admite productos nuevos y no muestra el formulario.
  */
 @Component({
-  imports: [
-    PageHeader,
-    ResourceState,
-    Card,
-    Alert,
-    Button,
-    RouterLink,
-    NoStoreNotice,
-    ProductForm,
-  ],
+  imports: [PageHeader, ResourceState, Card, Alert, Button, RouterLink, NoStoreNotice, ProductForm],
   template: `
     <div class="space-y-6">
       <app-page-header

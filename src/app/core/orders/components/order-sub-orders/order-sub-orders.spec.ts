@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { SubOrder } from '../../../../core/orders';
+import { SubOrder } from '../../models/orders.types';
 import { OrderSubOrders } from './order-sub-orders';
 
 const SUBS: SubOrder[] = [

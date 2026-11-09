@@ -3,10 +3,10 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { SessionRefresher } from '../../../../core/auth';
-import { MyStore } from '../../models/proveedor.types';
+import type { StoreDetail } from '../../../../core/catalog';
 import { MiTienda } from './mi-tienda';
 
-const STORE: MyStore = {
+const STORE: StoreDetail = {
   id: '507f1f77bcf86cd799439011',
   nombre: 'Agro Sur',
   nit: '900123',
@@ -72,7 +72,10 @@ describe('MiTienda', () => {
     const { el, settle, http } = setup();
     http
       .expectOne('/api/catalog/my-store')
-      .flush({ statusCode: 404, message: 'Tienda no encontrada' }, { status: 404, statusText: 'Not Found' });
+      .flush(
+        { statusCode: 404, message: 'Tienda no encontrada' },
+        { status: 404, statusText: 'Not Found' },
+      );
     await settle();
     expect(el.querySelector('app-store-form')).not.toBeNull();
     expect(el.querySelector('[role="alert"]')).toBeNull();

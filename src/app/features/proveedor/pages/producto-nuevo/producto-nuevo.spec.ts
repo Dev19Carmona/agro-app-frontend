@@ -3,10 +3,10 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { MyStore } from '../../models/proveedor.types';
+import type { StoreDetail } from '../../../../core/catalog';
 import { ProductoNuevo } from './producto-nuevo';
 
-const STORE: MyStore = {
+const STORE: StoreDetail = {
   id: '507f1f77bcf86cd799439011',
   nombre: 'Agro Sur',
   nit: '900123',
@@ -35,7 +35,7 @@ async function setup() {
     await harness.fixture.whenStable();
     harness.detectChanges();
   };
-  const respond = async (store: MyStore | 'none') => {
+  const respond = async (store: StoreDetail | 'none') => {
     const req = http.expectOne('/api/catalog/my-store');
     if (store === 'none') {
       req.flush({ message: 'x' }, { status: 404, statusText: 'Not Found' });

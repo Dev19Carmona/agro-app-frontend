@@ -178,15 +178,36 @@ describe('Mapa de rutas', () => {
     }
   });
 
-  it('lista las pantallas que aún usan el placeholder (las SPEC 09 las irá sustituyendo)', () => {
-    const pending = screens
+  it('las nueve pantallas de administración ya no usan el placeholder (SPEC 09)', () => {
+    const admin = screens.filter(({ path }) => path.startsWith('/admin'));
+    // El bundler renombra los archivos de los chunks: se comprueba la clase que carga cada ruta.
+    const expected: Record<string, string> = {
+      '/admin/usuarios': 'Usuarios',
+      '/admin/usuarios/:id': 'UsuarioDetalle',
+      '/admin/categorias': 'Categorias',
+      '/admin/tiendas': 'Tiendas',
+      '/admin/tiendas/:id': 'TiendaDetalle',
+      '/admin/pedidos': 'Pedidos',
+      '/admin/pedidos/:id': 'PedidoDetalle',
+      '/admin/pagos': 'Pagos',
+      '/admin/pagos/:id': 'PagoDetalle',
+    };
+    expect(admin.map(({ path }) => path).sort()).toEqual(Object.keys(expected).sort());
+    for (const { path, route } of admin) {
+      expect(String(route.loadComponent), `${path}: sigue siendo placeholder`).toContain(
+        `m.${expected[path]}`,
+      );
+      expect((route.data as RouteInfo).roles, `${path}: solo ADMIN`).toEqual(['ADMIN']);
+    }
+  });
+
+  it('ninguna ruta del árbol de la app usa el placeholder', () => {
+    const placeholders = all
       .filter(({ route }) => String(route.loadComponent).includes('route-placeholder'))
       .map(({ path }) => path);
-    console.info(`Pantallas con placeholder: ${pending.length} de ${screens.length}`);
-    // Con la SPEC 09 (administración) este número baja a 0.
-    expect(pending.length).toBeLessThanOrEqual(screens.length);
-    expect(pending.every((path) => SPEC_ROUTES.includes(path))).toBe(true);
+    expect(placeholders).toEqual([]);
   });
+
   it('los roles de cada pantalla son valores de SessionRole', () => {
     const valid: SessionRole[] = ['VISITANTE', 'PRODUCTOR', 'PROVEEDOR', 'ADMIN'];
     for (const { path, route } of screens) {

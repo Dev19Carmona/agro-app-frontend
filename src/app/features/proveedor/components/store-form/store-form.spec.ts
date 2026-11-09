@@ -1,10 +1,10 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { MyStore } from '../../models/proveedor.types';
+import type { StoreDetail } from '../../../../core/catalog';
 import { StoreForm } from './store-form';
 
-const STORE: MyStore = {
+const STORE: StoreDetail = {
   id: '507f1f77bcf86cd799439011',
   nombre: 'Agro Sur',
   nit: '900123',
@@ -17,7 +17,7 @@ const STORE: MyStore = {
 function setup() {
   TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });
   const fixture = TestBed.createComponent(StoreForm);
-  const created: MyStore[] = [];
+  const created: StoreDetail[] = [];
   fixture.componentInstance.created.subscribe((s) => created.push(s));
   fixture.detectChanges();
   const el = fixture.nativeElement as HTMLElement;

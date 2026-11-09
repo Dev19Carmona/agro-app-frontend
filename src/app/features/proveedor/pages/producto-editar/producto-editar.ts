@@ -39,10 +39,7 @@ import { ProveedorApi } from '../../services/proveedor-api';
   ],
   template: `
     <div class="space-y-6">
-      <app-page-header
-        title="Editar producto"
-        [description]="product() ? product()!.nombre : null"
-      >
+      <app-page-header title="Editar producto" [description]="product() ? product()!.nombre : null">
         <a actions app-button variant="secondary" routerLink="/proveedor/productos"
           >Volver a mis productos</a
         >

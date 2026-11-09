@@ -1,9 +1,12 @@
 import { Component, computed, input } from '@angular/core';
 import { formatCop } from '../../../../core/catalog';
-import { Payment } from '../../models/pagos.types';
+import {
+  Payment,
+  PaymentStatusBadge,
+  paymentMethodLabel,
+  rejectionMessage,
+} from '../../../../core/payments';
 import { formatDateTime } from '../../utils/format-date';
-import { paymentMethodLabel, rejectionMessage } from '../../utils/payment-status';
-import { PaymentStatusBadge } from '../payment-status-badge/payment-status-badge';
 
 /** Datos de un pago: estado, monto, método, referencia, motivo de rechazo y fecha. */
 @Component({

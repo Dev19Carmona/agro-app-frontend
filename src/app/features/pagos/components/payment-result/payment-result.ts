@@ -1,8 +1,7 @@
 import { Component, ElementRef, afterNextRender, computed, inject, input } from '@angular/core';
 import { Alert } from '../../../../shared/ui/alert/alert';
 import { AlertVariant } from '../../../../shared/ui/alert/alert.types';
-import { Payment } from '../../models/pagos.types';
-import { rejectionMessage } from '../../utils/payment-status';
+import { Payment, rejectionMessage } from '../../../../core/payments';
 
 interface ResultView {
   variant: AlertVariant;

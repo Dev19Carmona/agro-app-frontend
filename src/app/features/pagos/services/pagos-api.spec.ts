@@ -1,7 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { Payment } from '../models/pagos.types';
+import { Payment } from '../../../core/payments';
 import { PagosApi } from './pagos-api';
 
 const PAYMENT: Payment = {

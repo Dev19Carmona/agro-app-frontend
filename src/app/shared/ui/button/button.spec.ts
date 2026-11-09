@@ -38,7 +38,7 @@ describe('Button', () => {
   });
 
   it('es pill en todas las variantes', () => {
-    for (const variant of ['primary', 'secondary', 'ghost'] as const) {
+    for (const variant of ['primary', 'secondary', 'ghost', 'danger'] as const) {
       const { get } = setup({ variant });
       expect(get('text').classList.contains('rounded-pill')).toBe(true);
     }
@@ -47,6 +47,7 @@ describe('Button', () => {
   it.each<[ButtonVariant, string]>([
     ['primary', 'bg-brand'],
     ['secondary', 'border-line-strong'],
+    ['danger', 'text-danger'],
     ['ghost', 'hover:bg-sunken'],
   ])('variant %s aplica %s', (variant, cls) => {
     const { get } = setup({ variant });
