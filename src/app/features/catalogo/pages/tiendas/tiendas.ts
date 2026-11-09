@@ -1,23 +1,23 @@
 import { Component, computed, inject } from '@angular/core';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { CatalogApi } from '../../../../core/catalog';
+import { resourceApiError } from '../../../../core/http';
 import { Button } from '../../../../shared/ui/button/button';
 import { PageHeader } from '../../../../shared/ui/page-header/page-header';
 import { Pagination } from '../../../../shared/ui/pagination/pagination';
 import { CatalogoFilters } from '../../components/catalogo-filters/catalogo-filters';
-import { CatalogoState } from '../../components/catalogo-state/catalogo-state';
+import { ResourceState } from '../../../../shared/ui/resource-state/resource-state';
 import { StoreCard } from '../../components/store-card/store-card';
 import { FiltersValue } from '../../models/catalogo.types';
-import { CatalogoApi } from '../../services/catalogo-api';
 import { parseStoresFilter, toQueryParams } from '../../utils/filter-params';
-import { resourceApiError } from '../../utils/resource-error';
 
 /**
  * `/catalogo/tiendas`: directorio de tiendas activas con filtro por municipio y paginación. El
  * municipio y la página viven en la URL (`?municipio=…&page=…`).
  */
 @Component({
-  imports: [PageHeader, CatalogoFilters, CatalogoState, StoreCard, Pagination, Button, RouterLink],
+  imports: [PageHeader, CatalogoFilters, ResourceState, StoreCard, Pagination, Button, RouterLink],
   template: `
     <div class="space-y-6">
       <app-page-header
@@ -34,7 +34,7 @@ import { resourceApiError } from '../../utils/resource-error';
         <p class="text-sm text-fg-muted" aria-live="polite">{{ totalText() }}</p>
       }
 
-      <app-catalogo-state
+      <app-resource-state
         [loading]="stores.isLoading()"
         [error]="error()"
         [empty]="items().length === 0"
@@ -56,7 +56,7 @@ import { resourceApiError } from '../../utils/resource-error';
           [queryParams]="emptyView().linkParams"
           >{{ emptyView().linkLabel }}</a
         >
-      </app-catalogo-state>
+      </app-resource-state>
 
       <app-pagination
         ariaLabel="Paginación de tiendas"
@@ -68,7 +68,7 @@ import { resourceApiError } from '../../utils/resource-error';
   `,
 })
 export class Tiendas {
-  private readonly api = inject(CatalogoApi);
+  private readonly api = inject(CatalogApi);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 

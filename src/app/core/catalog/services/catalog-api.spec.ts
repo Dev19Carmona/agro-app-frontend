@@ -1,22 +1,22 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { Page, Product } from '../../../core/catalog';
-import { ApiError } from '../../../core/http';
-import { CatalogoApi } from './catalogo-api';
+import { ApiError } from '../../http';
+import { Page, Product } from '../models/catalog.types';
+import { CatalogApi } from './catalog-api';
 
 const ID = '507f1f77bcf86cd799439011';
 const EMPTY: Page<never> = { data: [], page: 1, limit: 12, total: 0, totalPages: 0 };
 
-describe('CatalogoApi', () => {
-  let api: CatalogoApi;
+describe('CatalogApi', () => {
+  let api: CatalogApi;
   let http: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [provideHttpClient(), provideHttpClientTesting()],
     });
-    api = TestBed.inject(CatalogoApi);
+    api = TestBed.inject(CatalogApi);
     http = TestBed.inject(HttpTestingController);
   });
 

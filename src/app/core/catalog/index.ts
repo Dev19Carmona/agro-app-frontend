@@ -1,3 +1,5 @@
+export { CATALOGO_PAGE_SIZE, STORE_LOOKUP_LIMIT } from './models/catalog-filters.types';
+export type { ProductsFilter, StoresFilter } from './models/catalog-filters.types';
 export type {
   Page,
   Product,
@@ -6,4 +8,5 @@ export type {
   PublicStore,
   PublicVariant,
 } from './models/catalog.types';
+export { CatalogApi } from './services/catalog-api';
 export { formatCop } from './utils/format-cop';

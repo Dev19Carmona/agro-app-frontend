@@ -121,6 +121,12 @@ export const routes: Routes = [
       },
 
       {
+        path: 'ui/resource-state',
+        loadComponent: () =>
+          import('./shared/ui/resource-state/resource-state-demo').then((m) => m.ResourceStateDemo),
+      },
+
+      {
         path: '**',
         title: 'Página no encontrada',
         loadComponent: () => import('./core/routing/pages/not-found/not-found').then((m) => m.NotFound),

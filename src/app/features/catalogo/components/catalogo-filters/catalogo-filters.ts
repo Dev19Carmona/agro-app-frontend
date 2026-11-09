@@ -39,7 +39,7 @@ import { MUNICIPIO_MAX_LENGTH } from '../../utils/filter-params';
         label="Municipio"
         autocomplete="off"
         [value]="municipioDraft()"
-        (valueChange)="municipioDraft.set($event)"
+        (valueChange)="municipioDraft.set('' + ($event ?? ''))"
       />
       <div class="flex flex-wrap gap-2 sm:col-span-full">
         <button app-button type="submit">Filtrar</button>

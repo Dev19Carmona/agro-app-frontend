@@ -1,6 +1,13 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Service, inject } from '@angular/core';
 import { Observable, catchError, throwError } from 'rxjs';
+import { API_BASE_URL, toApiError } from '../../http';
+import {
+  CATALOGO_PAGE_SIZE,
+  ProductsFilter,
+  STORE_LOOKUP_LIMIT,
+  StoresFilter,
+} from '../models/catalog-filters.types';
 import {
   Page,
   Product,
@@ -8,14 +15,7 @@ import {
   PublicCategory,
   PublicStore,
   PublicVariant,
-} from '../../../core/catalog';
-import { API_BASE_URL, toApiError } from '../../../core/http';
-import {
-  CATALOGO_PAGE_SIZE,
-  ProductsFilter,
-  STORE_LOOKUP_LIMIT,
-  StoresFilter,
-} from '../models/catalogo.types';
+} from '../models/catalog.types';
 
 /**
  * Cliente de los endpoints públicos `GET /catalog/*`. Todos los errores salen como `ApiError`.
@@ -24,7 +24,7 @@ import {
  * valor (nunca vacíos ni desconocidos), o respondería `400`.
  */
 @Service()
-export class CatalogoApi {
+export class CatalogApi {
   private readonly http = inject(HttpClient);
   private readonly base = `${inject(API_BASE_URL)}/catalog`;
 

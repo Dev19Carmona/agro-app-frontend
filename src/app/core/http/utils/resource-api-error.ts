@@ -1,4 +1,4 @@
-import { ApiError } from '../../../core/http';
+import { ApiError } from '../models/api-error';
 
 const UNEXPECTED: ApiError = { status: 500, message: 'Ocurrió un error inesperado' };
 

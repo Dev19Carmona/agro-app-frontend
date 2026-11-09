@@ -22,15 +22,15 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 
 ## Estructura de la app
 
-La app es el frontend del marketplace agropecuario Mini-Croper. Su backend es `agro-app-workspace` (NestJS, API en `:3000`); las reglas de negocio están en `docs/reglas-de-negocio.md` de ese repo. Auth (sesión, login, registro, cuenta y guards) y el catálogo público (`/catalogo`, detalle de producto, ofertas, tiendas y detalle de tienda) ya están conectados al backend; el resto de pantallas siguen siendo placeholders hasta la SPEC 06.
+La app es el frontend del marketplace agropecuario Mini-Croper. Su backend es `agro-app-workspace` (NestJS, API en `:3000`); las reglas de negocio están en `docs/reglas-de-negocio.md` de ese repo. Auth (sesión, login, registro, cuenta y guards) y el catálogo público (`/catalogo`, detalle de producto, ofertas, tiendas y detalle de tienda) y el módulo proveedor (`/proveedor/*`: tienda, productos, presentaciones, stock y pedidos recibidos) ya están conectados al backend; el resto de pantallas siguen siendo placeholders hasta la SPEC 07.
 
 ```
 src/app/
 ├── core/                 # infraestructura de la app (una sola instancia)
-│   ├── http/             # API_BASE_URL (`/api`), ApiError, toApiError
+│   ├── http/             # API_BASE_URL (`/api`), ApiError, toApiError, resourceApiError (utils/)
 │   ├── auth/             # SessionService, AuthApi, SessionRefresher, LogoutService, authInterceptor,
 │   │                     # safeReturnUrl, mensajes y validación de auth, tipos (SessionRole, AuthUser…)
-│   ├── catalog/          # tipos del catálogo público (Page, Product, PublicVariant…) y formatCop;
+│   ├── catalog/          # CatalogApi (services/), tipos del catálogo público y de filtros y formatCop;
 │   │                     # compartidos por las features (una feature no importa de otra)
 │   ├── theme/            # ThemeService y ThemeMenu (claro/oscuro/sistema, clase .app-dark en <html>)
 │   ├── navigation/       # NAV_ITEMS, NavigationService, tipos de nav y RouteInfo
@@ -38,7 +38,7 @@ src/app/
 │   │                     # Forbidden y NotFound
 │   └── layout/           # AppShell, AppHeader, AppSidePanel y AuthLayout (sin index.ts)
 ├── features/<dominio>/   # index.ts + <dominio>.routes.ts (+ pages/<pantalla>/ si ya está maquetada)
-│                         # (catalogo, auth, cuenta, pedidos, pagos, proveedor, admin)
+│                         # (catalogo, auth, cuenta, pedidos, pagos, proveedor, admin; proveedor ya tiene pantallas reales)
 └── shared/ui/            # componentes app-* (únicos que conocen Material/CDK)
 ```
 
@@ -111,7 +111,7 @@ Cada módulo (`core/<modulo>/` o `features/<dominio>/`) usa carpetas por tipo de
 - Está PROHIBIDO importar `@angular/material/*` y `@angular/cdk/*` fuera de `src/app/shared/ui/`. El tema de Material vive en `src/material-theme.scss` y se registra en `angular.json`.
 - Las features y páginas consumen solo los componentes `app-*`, nunca `mat-*` ni utilidades del CDK directamente.
 - No se usa PrimeNG: se eliminó por su licencia (ver `specs/01-skill-ui-component-y-tabla.md`).
-- Componentes disponibles (cada uno con demo en `/ui/<nombre>`): `app-table`, `app-icon`, `app-button`, `app-badge`, `app-card`, `app-page-header`, `app-empty-state`, `app-menu`, `app-drawer`, `app-input`, `app-select`, `app-checkbox`, `app-alert` y `app-pagination`. Antes de crear uno nuevo, revisa si ya existe o si basta ampliar uno.
+- Componentes disponibles (cada uno con demo en `/ui/<nombre>`): `app-table`, `app-icon`, `app-button`, `app-badge`, `app-card`, `app-page-header`, `app-empty-state`, `app-menu`, `app-drawer`, `app-input`, `app-select`, `app-checkbox`, `app-alert`, `app-pagination` y `app-resource-state` (cargando, error con Reintentar, vacío o contenido). `app-input` admite `type="number"` (valor `number | null`). Antes de crear uno nuevo, revisa si ya existe o si basta ampliar uno.
 - Los controles sin texto visible llevan `ariaLabel`; `app-icon` es decorativo salvo que reciba `label`.
 - `app-input`, `app-select` y `app-checkbox` son controles de Signal Forms: se enlazan con `[formField]` y muestran el primer error con `message` cuando el campo está tocado. Los formularios usan `form(model, schema, { submission })` con `[formRoot]`.
 

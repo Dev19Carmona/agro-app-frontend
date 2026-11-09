@@ -2,16 +2,16 @@ import { Component, computed, inject } from '@angular/core';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouterLink } from '@angular/router';
+import { CatalogApi } from '../../../../core/catalog';
+import { resourceApiError } from '../../../../core/http';
 import { PageHeader } from '../../../../shared/ui/page-header/page-header';
 import { Button } from '../../../../shared/ui/button/button';
 import { Pagination } from '../../../../shared/ui/pagination/pagination';
 import { CatalogoFilters } from '../../components/catalogo-filters/catalogo-filters';
-import { CatalogoState } from '../../components/catalogo-state/catalogo-state';
+import { ResourceState } from '../../../../shared/ui/resource-state/resource-state';
 import { ProductCard } from '../../components/product-card/product-card';
 import { FiltersValue } from '../../models/catalogo.types';
-import { CatalogoApi } from '../../services/catalogo-api';
 import { parseProductsFilter, toQueryParams } from '../../utils/filter-params';
-import { resourceApiError } from '../../utils/resource-error';
 
 /**
  * `/catalogo`: productos de todas las tiendas con filtros por categoría y municipio. Los filtros y
@@ -25,7 +25,7 @@ import { resourceApiError } from '../../utils/resource-error';
   imports: [
     PageHeader,
     CatalogoFilters,
-    CatalogoState,
+    ResourceState,
     ProductCard,
     Pagination,
     Button,
@@ -49,7 +49,7 @@ import { resourceApiError } from '../../utils/resource-error';
         <p class="text-sm text-fg-muted" aria-live="polite">{{ totalText() }}</p>
       }
 
-      <app-catalogo-state
+      <app-resource-state
         [loading]="products.isLoading()"
         [error]="error()"
         [empty]="items().length === 0"
@@ -76,7 +76,7 @@ import { resourceApiError } from '../../utils/resource-error';
           [queryParams]="emptyView().linkParams"
           >{{ emptyView().linkLabel }}</a
         >
-      </app-catalogo-state>
+      </app-resource-state>
 
       <app-pagination
         ariaLabel="Paginación de productos"
@@ -88,7 +88,7 @@ import { resourceApiError } from '../../utils/resource-error';
   `,
 })
 export class CatalogoList {
-  private readonly api = inject(CatalogoApi);
+  private readonly api = inject(CatalogApi);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 

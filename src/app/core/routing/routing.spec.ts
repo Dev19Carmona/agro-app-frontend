@@ -83,9 +83,9 @@ describe('Árbol de rutas', () => {
   });
 
   it('productos/nuevo no se confunde con productos/:id', async () => {
-    const { h1, codes } = await go('/proveedor/productos/nuevo', 'PROVEEDOR');
+    const { h1 } = await go('/proveedor/productos/nuevo', 'PROVEEDOR');
+    // Es la pantalla real de alta (ya no el placeholder), no la de edición `productos/:id`.
     expect(h1).toBe('Nuevo producto');
-    expect(codes).toEqual(['POST /catalog/products']);
   });
 
   it.each<[string, string, SessionRole]>([

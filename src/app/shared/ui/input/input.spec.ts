@@ -1,6 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormField, form, required } from '@angular/forms/signals';
+import { FormField, form, min, required } from '@angular/forms/signals';
 import { Input } from './input';
 import { InputType } from './input.types';
 
@@ -24,7 +24,24 @@ class PlainHost {
   readonly disabled = signal(false);
   readonly touched = signal(false);
   readonly errors = signal<{ kind: string; message?: string }[]>([]);
-  readonly value = signal('');
+  readonly value = signal<string | number | null>('');
+}
+
+@Component({
+  imports: [Input, FormField],
+  template: `<app-input
+    label="Precio"
+    type="number"
+    [step]="1"
+    [formField]="f.precio"
+  />`,
+})
+class NumberFormHost {
+  readonly model = signal<{ precio: number | null }>({ precio: null });
+  readonly f = form(this.model, (p) => {
+    required(p.precio, { message: 'Escribe el precio' });
+    min(p.precio, 1, { message: 'El precio mínimo es 1' });
+  });
 }
 
 @Component({
@@ -183,6 +200,74 @@ describe('Input', () => {
       const fixture = TestBed.createComponent(FormHost);
       await settle(fixture);
       expect(field(fixture).required).toBe(true);
+    });
+  });
+
+  describe('número', () => {
+    async function setup() {
+      const fixture = TestBed.createComponent(PlainHost);
+      fixture.componentInstance.type.set('number');
+      await settle(fixture);
+      return fixture;
+    }
+    async function type(fixture: ComponentFixture<PlainHost>, text: string) {
+      field(fixture).value = text;
+      field(fixture).dispatchEvent(new Event('input'));
+      await settle(fixture);
+    }
+
+    it('usa un input numérico y entrega un número', async () => {
+      const fixture = await setup();
+      expect(field(fixture).type).toBe('number');
+      await type(fixture, '12500');
+      expect(fixture.componentInstance.value()).toBe(12500);
+    });
+
+    it('vacío entrega null', async () => {
+      const fixture = await setup();
+      await type(fixture, '7');
+      await type(fixture, '');
+      expect(fixture.componentInstance.value()).toBeNull();
+    });
+
+    it('un valor null deja el campo vacío', async () => {
+      const fixture = await setup();
+      fixture.componentInstance.value.set(null);
+      await settle(fixture);
+      expect(field(fixture).value).toBe('');
+    });
+
+    it('refleja min, max y step como atributos', async () => {
+      const fixture = TestBed.createComponent(NumberFormHost);
+      await settle(fixture);
+      expect(field(fixture).getAttribute('min')).toBe('1');
+      expect(field(fixture).getAttribute('step')).toBe('1');
+      expect(field(fixture).getAttribute('max')).toBeNull();
+    });
+
+    it('la rueda del ratón quita el foco para no cambiar el valor', async () => {
+      const fixture = await setup();
+      document.body.appendChild(fixture.nativeElement);
+      field(fixture).focus();
+      expect(document.activeElement).toBe(field(fixture));
+      field(fixture).dispatchEvent(new WheelEvent('wheel'));
+      expect(document.activeElement).not.toBe(field(fixture));
+      fixture.nativeElement.remove();
+    });
+
+    it('con Signal Forms actualiza el modelo con un número y muestra su error', async () => {
+      const fixture = TestBed.createComponent(NumberFormHost);
+      await settle(fixture);
+      const el = fixture.nativeElement as HTMLElement;
+      field(fixture).dispatchEvent(new Event('blur'));
+      await settle(fixture);
+      expect(el.querySelector('mat-error')?.textContent).toContain('Escribe el precio');
+
+      field(fixture).value = '3400';
+      field(fixture).dispatchEvent(new Event('input'));
+      await settle(fixture);
+      expect(fixture.componentInstance.model().precio).toBe(3400);
+      expect(el.querySelector('mat-error')).toBeNull();
     });
   });
 });

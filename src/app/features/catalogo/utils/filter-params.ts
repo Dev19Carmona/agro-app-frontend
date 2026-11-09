@@ -1,4 +1,4 @@
-import { ProductsFilter, StoresFilter } from '../models/catalogo.types';
+import { ProductsFilter, StoresFilter } from '../../../core/catalog';
 
 /** Lo que usamos de `ParamMap`: se puede pasar uno del router o uno de prueba. */
 export interface ParamReader {
